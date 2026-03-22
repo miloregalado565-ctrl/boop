@@ -225,10 +225,6 @@ html,body{transition:background .3s,color .3s}
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="2" rx="1"/><rect x="2" y="7" width="8" height="2" rx="1"/><rect x="2" y="11" width="10" height="2" rx="1"/></svg>
       Content agent
     </div>
-    <div class="nav-item" onclick="showSection('settings',this)">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 2v1M8 13v1M2 8h1M13 8h1M3.5 3.5l.7.7M11.8 11.8l.7.7M3.5 12.5l.7-.7M11.8 4.2l.7-.7"/></svg>
-      Settings
-    </div>
     <div class="nav-section">Account</div>
     <div class="nav-item" onclick="showPaywall()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 5H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V6a1 1 0 00-1-1zM11 9H5M3 5V4a2 2 0 014 0v1"/></svg>
@@ -482,48 +478,6 @@ html,body{transition:background .3s,color .3s}
       </div>
     </div>
 
-    <!-- SETTINGS -->
-    <div class="section" id="sec-settings">
-      <div class="page-header">
-        <h1>Settings</h1>
-        <p>API keys and preferences</p>
-      </div>
-      <div class="card">
-        <div class="card-title">API keys</div>
-        <div class="api-row">
-          <span class="api-label">Pexels</span>
-          <input type="password" id="pexels-key" placeholder="Pexels API key" value="Rc9KmQfncnb4rZrJGWWfE0qPD10KzksnuIPjLzYJPdAwtPKm1QX39i7r"/>
-        </div>
-        <div class="api-row" style="margin-top:.5rem">
-          <span class="api-label">YouTube</span>
-          <input type="password" id="yt-key" placeholder="YouTube Data API v3 key (optional)"/>
-        </div>
-        <div class="api-row" style="margin-top:.5rem">
-          <span class="api-label">AdSense ID</span>
-          <input type="text" id="adsense-id" placeholder="ca-pub-XXXXXXXXXXXXXXXX"/>
-        </div>
-        <button class="btn btn-accent" style="margin-top:1rem" onclick="saveSettings()">Save settings</button>
-      </div>
-      <div class="card">
-        <div class="card-title">Monetization status</div>
-        <div style="font-size:13px;color:var(--muted);line-height:2">
-          <div>PayPal: <span style="color:var(--success)">paypal.me/Milorgldo — active</span></div>
-          <div>Starter plan: <span style="color:var(--success)">$7/month</span></div>
-          <div>Pro plan: <span style="color:var(--success)">$15/month</span></div>
-          <div>AdSense: <span style="color:#f0a500">Pending — paste publisher ID above</span></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Deploy instructions</div>
-        <div style="font-size:13px;color:var(--muted);line-height:2">
-          <div>1. Download this HTML file</div>
-          <div>2. Go to <a href="https://vercel.com" style="color:var(--accent)">vercel.com</a> → New project → drag & drop file</div>
-          <div>3. Your app is live at yourapp.vercel.app</div>
-          <div>4. Apply for AdSense at <a href="https://adsense.google.com" style="color:var(--accent)">adsense.google.com</a> with that URL</div>
-          <div>5. Paste publisher ID above when approved (1-3 days)</div>
-        </div>
-      </div>
-    </div>
 
   </div>
 </div>
@@ -792,9 +746,6 @@ function copyPackage() {
   setTimeout(()=>event.target.textContent='Copy all',2000);
 }
 
-function saveSettings() {
-  alert('Settings saved.');
-}
 
 updateUsesUI();
 
