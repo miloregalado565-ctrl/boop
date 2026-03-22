@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Boop — Your viral content robot</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<!-- ADSENSE: Replace ca-pub-XXXXXXXXXXXXXXXX with your publisher ID when approved -->
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+<style>
+:root[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #181818;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0f0f0;
+  --muted: #888;
+  --accent: #ff6b35;
+  --accent-dark: #cc4f1f;
+  --danger: #ff4d4d;
+  --success: #4dff9b;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+:root[data-theme="light"] {
+  --bg: #f5f2ee;
+  --surface: #ffffff;
+  --surface2: #edeae4;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a1a;
+  --muted: #888;
+  --accent: #ff6b35;
+  --accent-dark: #cc4f1f;
+  --danger: #e03030;
+  --success: #1a9955;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+h1,h2,h3,.logo{font-family:'Syne',sans-serif}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;background:var(--surface);border-right:0.5px solid var(--border);padding:1.5rem 1rem;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;flex-shrink:0}
+.main{flex:1;padding:2rem;max-width:900px}
+.logo{font-size:20px;font-weight:800;color:var(--accent);letter-spacing:-.5px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--border)}
+.logo span{color:var(--muted);font-size:12px;font-weight:400;display:block;font-family:'DM Sans',sans-serif;margin-top:2px}
+
+/* Nav */
+.nav-item{padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--surface2);color:var(--accent);font-weight:500}
+.nav-section{font-size:10px;color:#555;letter-spacing:.08em;text-transform:uppercase;padding:12px 12px 4px;margin-top:8px}
+
+/* Tier badge in sidebar */
+.tier-badge{margin-top:auto;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);border:0.5px solid var(--border2)}
+.tier-name{font-size:12px;font-weight:500;color:var(--accent);font-family:'Syne',sans-serif}
+.tier-uses{font-size:11px;color:var(--muted);margin-top:4px}
+.tier-bar{height:3px;background:var(--border2);border-radius:99px;margin-top:8px;overflow:hidden}
+.tier-bar-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.upgrade-btn{width:100%;margin-top:10px;padding:8px;font-size:12px;border-radius:var(--radius-sm);border:0.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;font-family:'Syne',sans-serif;font-weight:500;transition:all .15s}
+.upgrade-btn:hover{background:var(--accent);color:var(--bg)}
+
+/* Cards */
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:1rem;letter-spacing:.02em}
+
+/* Pills */
+.pill-group{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;padding:5px 12px;border-radius:99px;border:0.5px solid var(--border2);cursor:pointer;color:var(--muted);background:transparent;font-family:'DM Sans',sans-serif;transition:all .15s}
+.pill:hover{border-color:rgba(255,255,255,0.25);color:var(--text)}
+.pill.on{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500}
+
+/* Buttons */
+.btn{padding:10px 18px;font-size:13px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn:hover{background:var(--surface2)}
+.btn-accent{background:var(--accent);color:var(--bg);border-color:var(--accent);font-family:'Syne',sans-serif;font-weight:700}
+.btn-accent:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+
+/* Inputs */
+input[type=text],input[type=password],.api-input{padding:9px 12px;font-size:13px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;width:100%;outline:none;transition:border .15s}
+input:focus{border-color:rgba(232,255,77,0.4)}
+
+/* Output */
+.out{background:var(--surface2);border-radius:var(--radius-sm);padding:1rem;font-size:13px;color:var(--text);line-height:1.75;border:0.5px solid var(--border);min-height:50px}
+.out-label{font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+
+/* Spinner */
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{opacity:.6;font-size:13px;padding:.5rem 0}
+
+/* Video grid */
+.video-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:.75rem}
+.vid-card{border:0.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;background:var(--surface2);transition:border-color .15s}
+.vid-card:hover{border-color:var(--border2)}
+.vid-card.selected{border:1.5px solid var(--accent)}
+.vid-thumb{width:100%;aspect-ratio:9/16;position:relative;overflow:hidden;background:#0d0d0d}
+.vid-thumb video,.vid-thumb img{width:100%;height:100%;object-fit:cover}
+.vid-source{position:absolute;top:6px;right:6px;font-size:10px;padding:2px 6px;border-radius:99px;background:rgba(0,0,0,.7);color:var(--muted);border:0.5px solid var(--border)}
+.vid-info{padding:8px}
+.vid-title{font-size:11px;color:var(--text);line-height:1.4;font-weight:500}
+.vid-ch{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Story */
+.story-block{display:flex;flex-direction:column;gap:12px}
+.story-part{border-left:2px solid var(--accent);padding:0 0 0 14px}
+.story-part-label{font-size:10px;color:var(--accent);margin-bottom:3px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-family:'Syne',sans-serif}
+.story-text{font-size:13px;color:var(--text);line-height:1.8}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:0.5px solid var(--border);margin-bottom:1rem}
+.tab{font-size:13px;padding:8px 16px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:all .15s;font-family:'Syne',sans-serif;font-weight:500}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* Full script */
+.full-script{background:var(--surface2);border-radius:var(--radius-sm);padding:1rem;font-size:12px;line-height:1.9;color:var(--text);border:0.5px solid var(--border);white-space:pre-wrap;font-family:'DM Sans',sans-serif}
+
+/* Ad slots */
+.ad-slot{background:var(--surface2);border:0.5px dashed var(--border2);border-radius:var(--radius-sm);padding:1.5rem;text-align:center;margin:1rem 0}
+.ad-slot-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.ad-slot-sub{font-size:11px;color:#333}
+
+/* Paywall overlay */
+.paywall{display:none;background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);padding:2rem;text-align:center;margin-top:1rem}
+.paywall.visible{display:block}
+.paywall h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent);margin-bottom:.5rem}
+.paywall p{font-size:13px;color:var(--muted);margin-bottom:1.5rem;line-height:1.7}
+.tier-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:1.5rem}
+.tier-card{background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem;text-align:left;transition:border .15s}
+.tier-card.featured{border:1.5px solid var(--accent)}
+.tier-card-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.tier-card-price{font-size:22px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;margin-bottom:8px}
+.tier-card-price span{font-size:12px;color:var(--muted);font-weight:400}
+.tier-card ul{list-style:none;font-size:12px;color:var(--muted);line-height:2}
+.tier-card ul li::before{content:"+ ";color:var(--accent)}
+.tier-pay-btn{width:100%;margin-top:12px;padding:10px;font-size:12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .15s}
+.tier-pay-btn:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.tier-card.featured .tier-pay-btn{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.paywall-dismiss{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline}
+.paywall-dismiss:hover{color:var(--text)}
+.ppu-row{display:flex;gap:10px;margin-bottom:1.25rem;justify-content:center}
+.ppu-card{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:1rem 1.25rem;text-align:center;cursor:pointer;transition:border .15s;min-width:130px}
+.ppu-card:hover{border-color:var(--accent)}
+.ppu-price{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--accent)}
+.ppu-label{font-size:11px;color:var(--muted);margin-top:3px}
+.ppu-btn{margin-top:10px;width:100%;padding:7px;font-size:12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;font-weight:500;transition:all .15s}
+.ppu-btn:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.ppu-divider{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;font-size:11px;color:#444}
+.ppu-divider::before,.ppu-divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.credits-pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:0.5px solid var(--border2);border-radius:99px;padding:4px 12px;font-size:12px;cursor:pointer;margin-top:6px;transition:border .15s}
+.credits-pill:hover{border-color:var(--accent)}
+.credits-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.best-badge{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--accent);color:var(--bg);font-weight:700;font-family:'Syne',sans-serif;margin-bottom:8px;display:inline-block}
+
+/* Metrics row */
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}
+.metric{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:1rem}
+.metric-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.metric-val{font-size:22px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif}
+.metric-sub{font-size:11px;color:#555;margin-top:2px}
+
+/* Page header */
+.page-header{margin-bottom:1.5rem}
+.page-header h1{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+.page-header p{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* API key section */
+.api-row{display:flex;gap:8px;align-items:center;margin-bottom:.75rem}
+.api-label{font-size:12px;color:var(--muted);min-width:65px}
+
+/* Tag pills */
+.tag{font-size:11px;padding:3px 10px;border-radius:99px;border:0.5px solid var(--border2);color:var(--muted);background:var(--surface2)}
+
+/* Meta chip */
+.meta-chip{font-size:11px;padding:5px 12px;border-radius:var(--radius-sm);background:var(--surface2);border:0.5px solid var(--border);color:var(--muted);line-height:1.5}
+
+/* Sections */
+.section{display:none}
+.section.active{display:block}
+
+/* Boop corner */
+html,body{transition:background .3s,color .3s}
+.boop-corner{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.boop-bubble{background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;border-bottom-right-radius:4px;padding:9px 13px;font-size:12px;color:var(--text);font-family:'Syne',sans-serif;font-weight:500;white-space:nowrap}
+.boop-mini-btn{width:46px;height:46px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.boop-mini-btn:hover{transform:scale(1.12)}
+.boop-mini-btn svg{animation:bop 2s ease-in-out infinite}
+@keyframes bop{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.theme-toggle-app{position:fixed;top:16px;right:16px;z-index:998;width:36px;height:36px;border-radius:50%;border:0.5px solid var(--border2);background:var(--surface);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.theme-toggle-app:hover{background:var(--surface2)}
+
+/* Logo accent */
+.logo{color:var(--accent)!important}
+
+@media(max-width:700px){
+  .sidebar{display:none}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .tier-cards{grid-template-columns:1fr}
+  .video-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">Boop <span>Your viral content robot</span></div>
+    <div class="nav-section">Tools</div>
+    <div class="nav-item active" onclick="showSection('dashboard',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showSection('brainrot',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2C5 2 3 4 3 6.5c0 1.5.7 2.8 1.8 3.6L4 13h8l-.8-2.9C12.3 9.3 13 8 13 6.5 13 4 11 2 8 2z"/></svg>
+      Brainrot generator
+    </div>
+    <div class="nav-item" onclick="showSection('content',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="2" rx="1"/><rect x="2" y="7" width="8" height="2" rx="1"/><rect x="2" y="11" width="10" height="2" rx="1"/></svg>
+      Content agent
+    </div>
+    <div class="nav-item" onclick="showSection('settings',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 2v1M8 13v1M2 8h1M13 8h1M3.5 3.5l.7.7M11.8 11.8l.7.7M3.5 12.5l.7-.7M11.8 4.2l.7-.7"/></svg>
+      Settings
+    </div>
+    <div class="nav-section">Account</div>
+    <div class="nav-item" onclick="showPaywall()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 5H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V6a1 1 0 00-1-1zM11 9H5M3 5V4a2 2 0 014 0v1"/></svg>
+      Upgrade
+    </div>
+
+    <div class="tier-badge">
+      <div class="tier-name">Free plan</div>
+      <div class="tier-uses"><span id="uses-left">3</span> of 3 free uses left</div>
+      <div class="tier-bar"><div class="tier-bar-fill" id="tier-bar" style="width:100%"></div></div>
+      <button class="upgrade-btn" onclick="showPaywall()">Upgrade plan</button>
+      <div style="text-align:center">
+        <div class="credits-pill" onclick="showPaywall()">
+          <div class="credits-dot"></div>
+          <span id="credits-count">0</span> credits
+        </div>
+        <div style="font-size:10px;color:#555;margin-top:5px">99¢ per generation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="sec-dashboard">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Your Boop is ready to cook 🤖</p>
+      </div>
+
+      <!-- Ad slot top -->
+      <div class="ad-slot" id="ad-top">
+        <div class="ad-slot-label">Advertisement</div>
+        <!-- ADSENSE: uncomment when approved
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        -->
+        <div class="ad-slot-sub">Ad slot — paste AdSense code here when approved</div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Videos generated</div><div class="metric-val" id="m-vids">0</div><div class="metric-sub">this session</div></div>
+        <div class="metric"><div class="metric-label">Free uses left</div><div class="metric-val" id="m-uses">3</div><div class="metric-sub">then $7/mo</div></div>
+        <div class="metric"><div class="metric-label">Story types</div><div class="metric-val">6</div><div class="metric-sub">available</div></div>
+        <div class="metric"><div class="metric-label">Video sources</div><div class="metric-val">2</div><div class="metric-sub">Pexels + YouTube</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Quick start</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:1rem">Go to <strong style="color:var(--text)">Brainrot generator</strong> to create your first viral video script with background footage. Use <strong style="color:var(--text)">Content agent</strong> for full social media content packs.</p>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-accent" onclick="showSection('brainrot',null)">Start generating</button>
+          <button class="btn" onclick="showPaywall()">View plans</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRAINROT GENERATOR -->
+    <div class="section" id="sec-brainrot">
+      <div class="page-header">
+        <h1>Brainrot generator</h1>
+        <p>Reddit stories + royalty-free background video</p>
+      </div>
+
+      <!-- Ad slot -->
+      <div class="ad-slot" id="ad-brainrot">
+        <div class="ad-slot-label">Advertisement</div>
+        <div class="ad-slot-sub">Ad slot — paste AdSense code here when approved</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Story type</div>
+        <div class="pill-group" id="story-types">
+          <button class="pill on" onclick="pick(this,'type')">AITA Reddit</button>
+          <button class="pill" onclick="pick(this,'type')">True crime confess</button>
+          <button class="pill" onclick="pick(this,'type')">Unhinged coworker</button>
+          <button class="pill" onclick="pick(this,'type')">Entitled Karen</button>
+          <button class="pill" onclick="pick(this,'type')">Life plot twist</button>
+          <button class="pill" onclick="pick(this,'type')">Caught cheating</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Background video vibe</div>
+        <div class="pill-group" id="vid-vibes" style="margin-bottom:1rem">
+          <button class="pill on" onclick="pick(this,'vibe');loadVideos()">Minecraft parkour</button>
+          <button class="pill" onclick="pick(this,'vibe');loadVideos()">Subway surfers</button>
+          <button class="pill" onclick="pick(this,'vibe');loadVideos()">GTA driving</button>
+          <button class="pill" onclick="pick(this,'vibe');loadVideos()">Satisfying cooking</button>
+          <button class="pill" onclick="pick(this,'vibe');loadVideos()">Soap cutting</button>
+        </div>
+        <div class="out-label" id="vid-source-label">Live from Pexels — royalty free</div>
+        <div class="video-grid" id="vid-grid"><div class="loading"><span class="spinner"></span>Fetching clips...</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Voice style</div>
+        <div class="pill-group" id="voices">
+          <button class="pill on" onclick="pick(this,'voice')">Deadpan narrator</button>
+          <button class="pill" onclick="pick(this,'voice')">Dramatic true crime</button>
+          <button class="pill" onclick="pick(this,'voice')">Gen Z unhinged</button>
+          <button class="pill" onclick="pick(this,'voice')">Shocked bestie</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:1rem">
+        <button class="btn btn-accent" style="flex:1" onclick="generateBrainrot()">Generate full video script</button>
+        <button class="btn" onclick="generateBrainrot()">Regenerate</button>
+      </div>
+
+      <!-- Paywall -->
+      <div class="paywall" id="paywall-inline">
+        <h2>You've used your 3 free generations</h2>
+        <p>Pick how you want to keep creating. No commitments required.</p>
+
+        <div class="ppu-divider">Pay per use</div>
+        <div class="ppu-row">
+          <div class="ppu-card">
+            <div class="ppu-price">99¢</div>
+            <div class="ppu-label">1 generation</div>
+            <button class="ppu-btn" onclick="openPayPal('ppu1')">Pay with PayPal</button>
+          </div>
+          <div class="ppu-card" style="border-color:var(--accent)">
+            <div class="ppu-price">$3.99</div>
+            <div class="ppu-label">5 generations — save 20%</div>
+            <button class="ppu-btn" onclick="openPayPal('ppu5')">Pay with PayPal</button>
+          </div>
+        </div>
+
+        <div class="ppu-divider">Or subscribe</div>
+        <div class="tier-cards">
+          <div class="tier-card">
+            <div class="tier-card-name">Starter</div>
+            <div class="tier-card-price">$7<span>/month</span></div>
+            <ul>
+              <li>50 generations/mo</li>
+              <li>No ads</li>
+              <li>All story types</li>
+              <li>Pexels video search</li>
+            </ul>
+            <button class="tier-pay-btn" onclick="openPayPal('starter')">Pay with PayPal</button>
+          </div>
+          <div class="tier-card featured">
+            <div class="best-badge">Most popular</div>
+            <div class="tier-card-name">Pro</div>
+            <div class="tier-card-price">$15<span>/month</span></div>
+            <ul>
+              <li>Unlimited generations</li>
+              <li>No ads</li>
+              <li>YouTube CC videos</li>
+              <li>Priority features</li>
+            </ul>
+            <button class="tier-pay-btn" onclick="openPayPal('pro')">Pay with PayPal</button>
+          </div>
+          <div class="tier-card">
+            <div class="tier-card-name">Free</div>
+            <div class="tier-card-price">$0<span>/forever</span></div>
+            <ul>
+              <li>3 generations total</li>
+              <li>Ads shown</li>
+              <li>Basic story types</li>
+              <li>Limited video search</li>
+            </ul>
+            <button class="tier-pay-btn" onclick="dismissPaywall()">Continue free</button>
+          </div>
+        </div>
+        <span class="paywall-dismiss" onclick="dismissPaywall()">Maybe later — continue with ads</span>
+      </div>
+
+      <div id="brainrot-output" style="display:none">
+        <div class="tabs">
+          <div class="tab on" onclick="switchTab(this,'bscript')">Script</div>
+          <div class="tab" onclick="switchTab(this,'bhook')">Hook</div>
+          <div class="tab" onclick="switchTab(this,'bcaptions')">Captions</div>
+          <div class="tab" onclick="switchTab(this,'bpackage')">Full package</div>
+        </div>
+        <div id="tab-bscript"><div class="story-block" id="story-parts"></div></div>
+        <div id="tab-bhook" style="display:none">
+          <div class="out-label">Opening hook</div>
+          <div class="out" id="hook-out" style="font-size:15px;font-weight:500"></div>
+          <div class="out-label" style="margin-top:1rem">On-screen overlay</div>
+          <div class="out" id="overlay-out"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:.75rem" id="meta-out"></div>
+        </div>
+        <div id="tab-bcaptions" style="display:none">
+          <div class="out-label">Timed captions</div>
+          <div class="out" id="captions-out" style="font-family:monospace;font-size:12px;line-height:2"></div>
+        </div>
+        <div id="tab-bpackage" style="display:none">
+          <div class="out-label">Full package</div>
+          <div class="full-script" id="package-out"></div>
+          <button class="btn" style="font-size:12px;padding:6px 14px;margin-top:8px" onclick="copyPackage()">Copy all</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT AGENT -->
+    <div class="section" id="sec-content">
+      <div class="page-header">
+        <h1>Content agent</h1>
+        <p>Full social media content packs for any niche</p>
+      </div>
+
+      <div class="ad-slot">
+        <div class="ad-slot-label">Advertisement</div>
+        <div class="ad-slot-sub">Ad slot — paste AdSense code here when approved</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Your niche</div>
+        <div style="display:flex;gap:8px;margin-bottom:1rem">
+          <input type="text" id="niche-input" placeholder="e.g. fitness, real estate, food..." style="flex:1"/>
+        </div>
+        <div class="card-title" style="margin-bottom:.75rem">Platform</div>
+        <div class="pill-group" id="platforms" style="margin-bottom:1rem">
+          <button class="pill on" onclick="pick(this,'platform')">TikTok</button>
+          <button class="pill" onclick="pick(this,'platform')">Instagram</button>
+          <button class="pill" onclick="pick(this,'platform')">YouTube Shorts</button>
+          <button class="pill" onclick="pick(this,'platform')">Pinterest</button>
+        </div>
+        <div class="card-title" style="margin-bottom:.75rem">Goal</div>
+        <div class="pill-group" id="goals">
+          <button class="pill on" onclick="pick(this,'goal')">Virality</button>
+          <button class="pill" onclick="pick(this,'goal')">Education</button>
+          <button class="pill" onclick="pick(this,'goal')">Sales</button>
+          <button class="pill" onclick="pick(this,'goal')">Engagement</button>
+        </div>
+      </div>
+      <button class="btn btn-accent" style="width:100%;margin-bottom:1rem" onclick="generateContent()">Generate content pack</button>
+      <div id="content-output" style="display:none">
+        <div class="card">
+          <div class="out-label">Hook</div>
+          <div class="out" id="c-hook" style="font-weight:500;font-size:15px;margin-bottom:1rem"></div>
+          <div class="out-label">Caption</div>
+          <div class="out" id="c-caption" style="margin-bottom:1rem"></div>
+          <div class="out-label">Hashtags</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem" id="c-tags"></div>
+          <div class="out-label">Image brief</div>
+          <div class="out" id="c-brief" style="font-size:12px;color:#888;margin-bottom:1rem"></div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;background:var(--surface2);border-radius:var(--radius-sm);padding:.75rem">
+              <div class="out-label">Post at</div>
+              <div style="font-size:13px" id="c-time"></div>
+            </div>
+            <div style="flex:2;background:var(--surface2);border-radius:var(--radius-sm);padding:.75rem">
+              <div class="out-label">Why it works</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6" id="c-why"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section" id="sec-settings">
+      <div class="page-header">
+        <h1>Settings</h1>
+        <p>API keys and preferences</p>
+      </div>
+      <div class="card">
+        <div class="card-title">API keys</div>
+        <div class="api-row">
+          <span class="api-label">Pexels</span>
+          <input type="password" id="pexels-key" placeholder="Pexels API key" value="Rc9KmQfncnb4rZrJGWWfE0qPD10KzksnuIPjLzYJPdAwtPKm1QX39i7r"/>
+        </div>
+        <div class="api-row" style="margin-top:.5rem">
+          <span class="api-label">YouTube</span>
+          <input type="password" id="yt-key" placeholder="YouTube Data API v3 key (optional)"/>
+        </div>
+        <div class="api-row" style="margin-top:.5rem">
+          <span class="api-label">AdSense ID</span>
+          <input type="text" id="adsense-id" placeholder="ca-pub-XXXXXXXXXXXXXXXX"/>
+        </div>
+        <button class="btn btn-accent" style="margin-top:1rem" onclick="saveSettings()">Save settings</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Monetization status</div>
+        <div style="font-size:13px;color:var(--muted);line-height:2">
+          <div>PayPal: <span style="color:var(--success)">paypal.me/Milorgldo — active</span></div>
+          <div>Starter plan: <span style="color:var(--success)">$7/month</span></div>
+          <div>Pro plan: <span style="color:var(--success)">$15/month</span></div>
+          <div>AdSense: <span style="color:#f0a500">Pending — paste publisher ID above</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Deploy instructions</div>
+        <div style="font-size:13px;color:var(--muted);line-height:2">
+          <div>1. Download this HTML file</div>
+          <div>2. Go to <a href="https://vercel.com" style="color:var(--accent)">vercel.com</a> → New project → drag & drop file</div>
+          <div>3. Your app is live at yourapp.vercel.app</div>
+          <div>4. Apply for AdSense at <a href="https://adsense.google.com" style="color:var(--accent)">adsense.google.com</a> with that URL</div>
+          <div>5. Paste publisher ID above when approved (1-3 days)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const PAYPAL = 'https://paypal.me/Milorgldo';
+const MAX_FREE = 3;
+let usesLeft = parseInt(localStorage.getItem('brainrot_uses') || MAX_FREE);
+let isPro = localStorage.getItem('brainrot_pro') === 'true';
+let credits = parseInt(localStorage.getItem('brainrot_credits') || 0);
+
+const state = {
+  type:'AITA Reddit', vibe:'Minecraft parkour', voice:'Deadpan narrator',
+  platform:'TikTok', goal:'Virality',
+  selectedVid:null
+};
+
+const vibeQueries = {
+  'Minecraft parkour':'minecraft',
+  'Subway surfers':'running city',
+  'GTA driving':'city driving night',
+  'Satisfying cooking':'cooking satisfying',
+  'Soap cutting':'soap cutting'
+};
+const ytQueries = {
+  'Minecraft parkour':'minecraft parkour',
+  'Subway surfers':'subway surfers gameplay',
+  'GTA driving':'GTA driving gameplay',
+  'Satisfying cooking':'satisfying cooking asmr',
+  'Soap cutting':'soap cutting asmr'
+};
+
+function updateUsesUI() {
+  const left = isPro ? '∞' : usesLeft;
+  document.getElementById('uses-left').textContent = left;
+  document.getElementById('m-uses').textContent = left;
+  document.getElementById('credits-count').textContent = credits;
+  const pct = isPro ? 100 : Math.max(0,(usesLeft/MAX_FREE)*100);
+  document.getElementById('tier-bar').style.width = pct+'%';
+  if(isPro) {
+    document.querySelector('.tier-name').textContent = 'Pro plan';
+    document.querySelector('.tier-uses').textContent = 'Unlimited generations';
+  }
+}
+
+function showSection(name, el) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='brainrot') loadVideos();
+}
+
+function pick(el, group) {
+  const map = {type:'story-types',vibe:'vid-vibes',voice:'voices',platform:'platforms',goal:'goals'};
+  document.getElementById(map[group]).querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  state[group] = el.textContent.trim();
+}
+
+function showPaywall() {
+  document.getElementById('paywall-inline').classList.add('visible');
+  showSection('brainrot', null);
+}
+
+function dismissPaywall() {
+  document.getElementById('paywall-inline').classList.remove('visible');
+}
+
+function openPayPal(tier) {
+  const config = {
+    ppu1:  {amount:'0.99', credits:1,  label:'1 generation'},
+    ppu5:  {amount:'3.99', credits:5,  label:'5 generations'},
+    starter:{amount:'7',   credits:50, label:'Starter plan'},
+    pro:   {amount:'15',   credits:999,label:'Pro plan'}
+  };
+  const t = config[tier] || config.ppu1;
+  window.open(PAYPAL+'/'+t.amount+'USD', '_blank');
+  setTimeout(()=>{
+    if(confirm(`Did you complete your $${t.amount} payment for ${t.label}? Click OK to unlock.`)) {
+      if(tier==='pro' || tier==='starter') {
+        isPro = tier==='pro';
+        usesLeft = t.credits;
+        localStorage.setItem('brainrot_pro', isPro?'true':'false');
+        document.querySelector('.tier-name').textContent = t.label;
+      } else {
+        const cur = parseInt(localStorage.getItem('brainrot_credits')||0);
+        const newCreds = cur + t.credits;
+        localStorage.setItem('brainrot_credits', newCreds);
+        credits = newCreds;
+      }
+      localStorage.setItem('brainrot_uses', t.credits);
+      usesLeft = t.credits;
+      updateUsesUI();
+      dismissPaywall();
+      alert('Unlocked! Enjoy your generations.');
+    }
+  }, 3000);
+}
+
+function checkUsage() {
+  if(isPro) return true;
+  if(usesLeft > 0) {
+    usesLeft--;
+    localStorage.setItem('brainrot_uses', usesLeft);
+    updateUsesUI();
+    return true;
+  }
+  if(credits > 0) {
+    credits--;
+    localStorage.setItem('brainrot_credits', credits);
+    updateUsesUI();
+    return true;
+  }
+  showPaywall();
+  return false;
+}
+
+async function loadVideos() {
+  const grid = document.getElementById('vid-grid');
+  const label = document.getElementById('vid-source-label');
+  state.selectedVid = null;
+  grid.innerHTML = '<div class="loading"><span class="spinner"></span>Fetching clips...</div>';
+
+  const pexelsKey = document.getElementById('pexels-key')?.value.trim() || 'Rc9KmQfncnb4rZrJGWWfE0qPD10KzksnuIPjLzYJPdAwtPKm1QX39i7r';
+  const ytKey = document.getElementById('yt-key')?.value.trim() || '';
+  const query = vibeQueries[state.vibe] || 'parkour';
+  let videos = [], source = '';
+
+  if(pexelsKey) {
+    try {
+      const r = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=6&orientation=portrait`,{headers:{Authorization:pexelsKey}});
+      const data = await r.json();
+      if(data.videos?.length) {
+        videos = data.videos.slice(0,3).map(v=>({
+          id:v.id, title:v.url.split('/').filter(Boolean).pop().replace(/-/g,' '),
+          thumb:v.image, videoUrl:(v.video_files.find(f=>f.quality==='sd')||v.video_files[0]).link,
+          source:'Pexels', link:v.url
+        }));
+        source = 'Live from Pexels — royalty free';
+      }
+    } catch(e){}
+  }
+
+  if(!videos.length && ytKey) {
+    try {
+      const ytQ = ytQueries[state.vibe]||'minecraft parkour';
+      const r = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(ytQ)}&type=video&videoLicense=creativeCommon&maxResults=3&key=${ytKey}`);
+      const data = await r.json();
+      if(data.items?.length) {
+        videos = data.items.map(v=>({
+          id:v.id.videoId, title:v.snippet.title,
+          thumb:v.snippet.thumbnails.medium.url, videoUrl:null,
+          source:'YouTube CC', link:'https://youtube.com/watch?v='+v.id.videoId
+        }));
+        source = 'Live from YouTube — Creative Commons';
+      }
+    } catch(e){}
+  }
+
+  if(!videos.length) {
+    grid.innerHTML = '<div class="loading">No clips found. Check API key or try a different vibe.</div>';
+    return;
+  }
+  label.textContent = source;
+  window._vids = videos;
+  grid.innerHTML = videos.map((v,i)=>`
+    <div class="vid-card" id="vc${i}" onclick="selectVid(${i})">
+      <div class="vid-thumb">
+        ${v.videoUrl
+          ? `<video src="${v.videoUrl}" muted loop playsinline onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0" poster="${v.thumb}" style="width:100%;height:100%;object-fit:cover"></video>`
+          : `<img src="${v.thumb}" style="width:100%;height:100%;object-fit:cover"/>`}
+        <span class="vid-source">${v.source}</span>
+      </div>
+      <div class="vid-info">
+        <div class="vid-title">${v.title.slice(0,45)}${v.title.length>45?'...':''}</div>
+        <div class="vid-ch"><a href="${v.link}" style="color:#666;font-size:11px;text-decoration:none">View source</a></div>
+      </div>
+    </div>`).join('');
+}
+
+function selectVid(i) {
+  document.querySelectorAll('.vid-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('vc'+i).classList.add('selected');
+  state.selectedVid = window._vids[i];
+}
+
+async function generateBrainrot() {
+  if(!checkUsage()) return;
+  document.getElementById('brainrot-output').style.display = 'block';
+  document.getElementById('paywall-inline').classList.remove('visible');
+  document.getElementById('story-parts').innerHTML = '<div class="loading"><span class="spinner"></span>Writing your brainrot...</div>';
+  ['hook-out','overlay-out','captions-out','package-out'].forEach(id=>document.getElementById(id).innerHTML='<span class="spinner"></span>');
+  document.getElementById('meta-out').innerHTML = '';
+  document.getElementById('m-vids').textContent = parseInt(document.getElementById('m-vids').textContent||0)+1;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`You are a viral brainrot content creator. Generate a complete vertical video package.
+Story type: ${state.type}
+Voice: ${state.voice}
+Background: ${state.vibe}
+Return ONLY valid JSON:
+{"hook":"first 3-second hook impossible to scroll past","overlay_text":"5 words max on-screen text","story_intro":"2-3 sentences setting up drama","story_build":"escalate with shocking detail","story_climax":"the twist or most unhinged moment","story_outro":"1-2 sentences driving comments","caption":"TikTok caption with personality + question","hashtags":["t1","t2","t3","t4","t5","t6"],"timed_captions":["0:00-0:03: hook","0:03-0:08: line","0:08-0:15: line","0:15-0:25: line","0:25-0:40: line","0:40-0:50: outro"],"posting_tip":"one specific viral tip"}`}]})
+    });
+    const data = await resp.json();
+    const p = JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+
+    document.getElementById('story-parts').innerHTML = `
+      <div class="story-part"><div class="story-part-label">Intro</div><div class="story-text">${p.story_intro}</div></div>
+      <div class="story-part"><div class="story-part-label">Build</div><div class="story-text">${p.story_build}</div></div>
+      <div class="story-part"><div class="story-part-label">Climax</div><div class="story-text">${p.story_climax}</div></div>
+      <div class="story-part"><div class="story-part-label">Outro</div><div class="story-text">${p.story_outro}</div></div>`;
+    document.getElementById('hook-out').textContent = p.hook;
+    document.getElementById('overlay-out').textContent = p.overlay_text;
+    document.getElementById('meta-out').innerHTML = `<div class="meta-chip">Tip: ${p.posting_tip}</div>`;
+    document.getElementById('captions-out').innerHTML = p.timed_captions.map(c=>`<div>${c}</div>`).join('');
+    const tags = p.hashtags.map(h=>'#'+h.replace('#','')).join(' ');
+    const vidInfo = state.selectedVid ? `${state.selectedVid.title}\n${state.selectedVid.link}` : `${state.vibe} — select a clip above`;
+    document.getElementById('package-out').textContent = `HOOK: ${p.hook}\nOVERLAY: ${p.overlay_text}\n\n--- SCRIPT ---\n${p.story_intro}\n\n${p.story_build}\n\n${p.story_climax}\n\n${p.story_outro}\n\n--- CAPTION ---\n${p.caption}\n${tags}\n\n--- TIMED CAPTIONS ---\n${p.timed_captions.join('\n')}\n\n--- BACKGROUND VIDEO ---\n${vidInfo}\n\n--- TIP ---\n${p.posting_tip}`;
+  } catch(e) {
+    document.getElementById('story-parts').innerHTML = '<div style="color:#ff4d4d;font-size:13px">Error. Try again.</div>';
+  }
+}
+
+async function generateContent() {
+  if(!checkUsage()) return;
+  const niche = document.getElementById('niche-input').value.trim() || 'lifestyle';
+  document.getElementById('content-output').style.display = 'block';
+  ['c-hook','c-caption','c-tags','c-brief','c-time','c-why'].forEach(id=>document.getElementById(id).innerHTML='<span class="spinner"></span>');
+  document.getElementById('m-vids').textContent = parseInt(document.getElementById('m-vids').textContent||0)+1;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:`You are a world-class social media strategist. Generate a complete vertical content plan.
+Niche: ${niche}, Platform: ${state.platform}, Goal: ${state.goal}
+Return ONLY valid JSON:
+{"hook":"first 3-second hook","caption":"full caption with CTA","hashtags":["t1","t2","t3","t4","t5"],"image_brief":"vertical 9:16 photo art direction","posting_time":"best time to post","why_itll_work":"psychological trigger explanation"}`}]})
+    });
+    const data = await resp.json();
+    const p = JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+    document.getElementById('c-hook').textContent = p.hook;
+    document.getElementById('c-caption').textContent = p.caption;
+    document.getElementById('c-tags').innerHTML = p.hashtags.map(h=>`<span class="tag">#${h.replace('#','')}</span>`).join('');
+    document.getElementById('c-brief').textContent = p.image_brief;
+    document.getElementById('c-time').textContent = p.posting_time;
+    document.getElementById('c-why').textContent = p.why_itll_work;
+  } catch(e) {
+    document.getElementById('c-hook').textContent = 'Error. Try again.';
+  }
+}
+
+function switchTab(el, name) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  ['bscript','bhook','bcaptions','bpackage'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===name?'block':'none';
+  });
+}
+
+function copyPackage() {
+  navigator.clipboard.writeText(document.getElementById('package-out').textContent).catch(()=>{});
+  event.target.textContent = 'Copied!';
+  setTimeout(()=>event.target.textContent='Copy all',2000);
+}
+
+function saveSettings() {
+  alert('Settings saved.');
+}
+
+updateUsesUI();
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-btn-app').textContent = isDark ? '🌙' : '☀️';
+}
+
+const boopSays = [
+  "beep boop 🤖","i got you bestie","let me cook...","going viral rn","say less!","boop! 👆","trust the process","your content slaps"
+];
+let bi = 0;
+setInterval(()=>{
+  bi = (bi+1) % boopSays.length;
+  const el = document.getElementById('boop-corner-msg');
+  if(el) el.textContent = boopSays[bi];
+}, 4000);
+</script>
+
+<!-- Theme toggle -->
+<button class="theme-toggle-app" onclick="toggleTheme()" id="theme-btn-app">☀️</button>
+
+<!-- Boop corner mascot -->
+<div class="boop-corner">
+  <div class="boop-bubble" id="boop-corner-msg">beep boop 🤖</div>
+  <button class="boop-mini-btn" onclick="showSection('brainrot', null)">
+    <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="22" r="14" fill="white"/>
+      <rect x="11" y="16" width="18" height="12" rx="4" fill="#fff3ee"/>
+      <rect x="13" y="18" width="6" height="6" rx="2" fill="#ff6b35"/>
+      <rect x="21" y="18" width="6" height="6" rx="2" fill="#ff6b35"/>
+      <rect x="15" y="20" width="2" height="2" rx="1" fill="white" opacity=".8"/>
+      <rect x="23" y="20" width="2" height="2" rx="1" fill="white" opacity=".8"/>
+      <path d="M14 25 Q20 29 26 25" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"/>
+      <rect x="18" y="6" width="4" height="9" rx="2" fill="white" opacity=".8"/>
+      <circle cx="20" cy="5" r="3" fill="white" opacity=".6"/>
+    </svg>
+  </button>
+</div>
+</body>
+</html>
