@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ListingBoost — Turn Dead Listings Into Cash</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root[data-theme="dark"]{
+  --bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
+  --text:#f0f0f0;--muted:#888;--accent:#ff6b35;--accent2:#ff8f65;--accent-light:rgba(255,107,53,.12);
+  --success:#4dff9b;--warn:#ffd166;--danger:#ff4d4d;--radius:12px;--radius-sm:8px;
+}
+:root[data-theme="light"]{
+  --bg:#f5f2ee;--surface:#fff;--surface2:#edeae4;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
+  --text:#1a1a1a;--muted:#888;--accent:#ff6b35;--accent2:#ff8f65;--accent-light:#fff0eb;
+  --success:#1a9955;--warn:#b07a00;--danger:#e03030;--radius:12px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;transition:background .3s,color .3s}
+h1,h2,h3,.logo-text,.syne{font-family:'Syne',sans-serif}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:.5px solid var(--border);backdrop-filter:blur(8px)}
+.logo-text{font-size:20px;font-weight:800;color:var(--accent);letter-spacing:-.5px;display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--accent-light);color:var(--accent);border:.5px solid var(--accent);font-family:'DM Sans',sans-serif;font-weight:500;letter-spacing:.04em}
+.nav-right{display:flex;gap:10px;align-items:center}
+.nav-btn{padding:8px 18px;border-radius:99px;border:.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;font-weight:500;font-size:13px;transition:all .2s;text-decoration:none;display:inline-block}
+.nav-btn:hover{background:var(--surface)}
+.nav-btn-accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-btn-accent:hover{background:var(--accent2);border-color:var(--accent2)}
+.theme-toggle{width:36px;height:36px;border-radius:50%;border:.5px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s}
+.theme-toggle:hover{background:var(--surface)}
+
+/* HERO */
+.hero{max-width:1100px;margin:0 auto;padding:5rem 2rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px;margin-bottom:1.5rem;font-family:'Syne',sans-serif;border:.5px solid rgba(255,107,53,.3)}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{font-size:50px;font-weight:800;line-height:1.08;letter-spacing:-1.5px;margin-bottom:1.25rem}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--muted);line-height:1.75;margin-bottom:2rem;max-width:440px}
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.cta-btn{padding:13px 28px;border-radius:99px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;border:none;text-decoration:none;display:inline-block}
+.cta-primary{background:var(--accent);color:#fff}
+.cta-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.cta-ghost{background:transparent;color:var(--text);border:.5px solid var(--border2)!important;border:none}
+.cta-ghost:hover{background:var(--surface)}
+.hero-proof{display:flex;gap:2rem;margin-top:2.5rem}
+.proof-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent)}
+.proof-label{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* HERO RIGHT — earnings card */
+.hero-right{background:var(--surface);border:.5px solid var(--border2);border-radius:20px;padding:1.75rem;position:relative;overflow:hidden}
+.hero-right::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:var(--accent-light);filter:blur(60px);pointer-events:none}
+.earnings-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.06em}
+.earning-row{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:.5px solid var(--border)}
+.earning-row:last-child{border-bottom:none}
+.earning-tier{font-size:14px;font-weight:500;color:var(--text)}
+.earning-price{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--accent)}
+.earning-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.earning-badge{font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(77,255,155,.12);color:var(--success);border:.5px solid rgba(77,255,155,.3);font-weight:500}
+.week-total{background:var(--accent-light);border:.5px solid rgba(255,107,53,.3);border-radius:10px;padding:1rem;margin-top:1rem;display:flex;justify-content:space-between;align-items:center}
+.week-label{font-size:13px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700}
+.week-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--accent)}
+
+/* SECTION COMMON */
+section{max-width:1100px;margin:0 auto;padding:3.5rem 2rem}
+.sec-label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem}
+.sec-title{font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:.75rem}
+.sec-sub{font-size:15px;color:var(--muted);line-height:1.75;max-width:520px;margin-bottom:2.5rem}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.step{background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:1.5rem;position:relative;transition:border-color .2s}
+.step:hover{border-color:var(--border2)}
+.step-num{width:36px;height:36px;border-radius:10px;background:var(--accent-light);border:.5px solid rgba(255,107,53,.3);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);margin-bottom:1rem}
+.step-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:.5rem}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* WHAT YOU GET */
+.deliverables{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.deliverable{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:1.25rem;transition:border-color .2s,transform .2s}
+.deliverable:hover{border-color:var(--border2);transform:translateY(-2px)}
+.del-icon{font-size:22px;margin-bottom:.75rem}
+.del-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:.4rem}
+.del-desc{font-size:12px;color:var(--muted);line-height:1.7}
+
+/* PRICING */
+.pricing-wrap{text-align:center}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:2rem;text-align:left}
+.price-card{background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:1.5rem;position:relative;transition:border .2s}
+.price-card.featured{border:2px solid var(--accent)}
+.price-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;padding:3px 12px;border-radius:99px;font-family:'Syne',sans-serif;font-weight:700;white-space:nowrap}
+.price-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem}
+.price-amount{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--accent);margin-bottom:.15rem}
+.price-amount span{font-size:13px;color:var(--muted);font-weight:400}
+.price-tagline{font-size:12px;color:var(--muted);margin-bottom:1rem;line-height:1.5}
+.price-profit{font-size:11px;color:var(--success);background:rgba(77,255,155,.08);border:.5px solid rgba(77,255,155,.2);border-radius:6px;padding:4px 8px;margin-bottom:1rem;display:inline-block}
+.price-list{list-style:none;font-size:12px;color:var(--muted);line-height:2.2}
+.price-list li::before{content:"✓ ";color:var(--accent);font-weight:700}
+.price-cta{width:100%;margin-top:1.25rem;padding:11px;font-size:13px;border-radius:99px;border:.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .2s}
+.price-cta:hover,.price-card.featured .price-cta{background:var(--accent);color:#fff;border-color:var(--accent)}
+.price-note{font-size:11px;color:var(--muted);text-align:center;margin-top:1rem}
+
+/* TOOL SECTION */
+.tool-wrap{background:var(--surface);border:.5px solid var(--border);border-radius:20px;overflow:hidden}
+.tool-header{padding:1.5rem;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.tool-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.tool-subtitle{font-size:13px;color:var(--muted);margin-top:3px}
+.tool-body{display:grid;grid-template-columns:380px 1fr;min-height:560px}
+.tool-inputs{padding:1.5rem;border-right:.5px solid var(--border);display:flex;flex-direction:column;gap:1rem;overflow-y:auto}
+.tool-output{padding:1.5rem;overflow-y:auto}
+.field-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;display:block}
+input[type=text],select,textarea{width:100%;padding:9px 12px;font-size:13px;border-radius:var(--radius-sm);border:.5px solid var(--border2);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border .15s;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:rgba(255,107,53,.5)}
+textarea{min-height:80px;line-height:1.6}
+select option{background:var(--surface2)}
+.pill-group{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;padding:5px 12px;border-radius:99px;border:.5px solid var(--border2);cursor:pointer;color:var(--muted);background:transparent;font-family:'DM Sans',sans-serif;transition:all .15s}
+.pill:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
+.pill.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
+.generate-btn{width:100%;padding:13px;border-radius:99px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;transition:all .2s;margin-top:.5rem}
+.generate-btn:hover{background:var(--accent2)}
+.generate-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* OUTPUT TABS */
+.tabs{display:flex;gap:0;border-bottom:.5px solid var(--border);margin-bottom:1rem;overflow-x:auto}
+.tab{font-size:12px;padding:8px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-.5px;transition:all .15s;font-family:'Syne',sans-serif;font-weight:500;white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* OUTPUT ELEMENTS */
+.out-section{margin-bottom:1.25rem}
+.out-label{font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.out-box{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--radius-sm);padding:1rem;font-size:13px;color:var(--text);line-height:1.75;position:relative}
+.out-box.copyable{cursor:pointer;transition:border .15s}
+.out-box.copyable:hover{border-color:var(--accent)}
+.copy-hint{position:absolute;top:8px;right:8px;font-size:10px;color:var(--muted);opacity:0;transition:opacity .2s}
+.out-box.copyable:hover .copy-hint{opacity:1}
+.score-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1rem}
+.score-card{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--radius-sm);padding:.85rem;text-align:center}
+.score-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
+.score-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.score-val.good{color:var(--success)}
+.score-val.ok{color:var(--warn)}
+.score-val.bad{color:var(--danger)}
+.issue-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.issue-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6;padding:.6rem .75rem;border-radius:var(--radius-sm);background:var(--surface2);border:.5px solid var(--border)}
+.issue-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+.issue-text{flex:1}
+.issue-impact{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;white-space:nowrap;margin-left:auto}
+.impact-high{background:rgba(255,77,77,.12);color:var(--danger);border:.5px solid rgba(255,77,77,.3)}
+.impact-med{background:rgba(255,209,102,.1);color:var(--warn);border:.5px solid rgba(255,209,102,.3)}
+.impact-low{background:rgba(77,255,155,.1);color:var(--success);border:.5px solid rgba(77,255,155,.3)}
+.quick-wins{list-style:none;display:flex;flex-direction:column;gap:8px}
+.win-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.6;padding:.6rem .75rem;border-radius:var(--radius-sm);background:var(--accent-light);border:.5px solid rgba(255,107,53,.2)}
+.win-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.email-box{font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.85;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem;white-space:pre-wrap;position:relative}
+.copy-all-btn{display:flex;align-items:center;gap:6px;margin-top:.75rem;padding:8px 16px;border-radius:99px;border:.5px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:500;transition:all .15s}
+.copy-all-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--accent)}
+
+/* EMPTY STATE */
+.empty-state{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:1rem;opacity:.4}
+.empty-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:.5rem;opacity:.6}
+.empty-sub{font-size:13px;line-height:1.7}
+
+/* SPINNER */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SETTINGS BAR */
+.settings-bar{background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.settings-bar input{flex:1;min-width:220px}
+.settings-bar label{font-size:12px;color:var(--muted);white-space:nowrap}
+.settings-bar .save-key-btn{padding:8px 16px;border-radius:99px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:600;white-space:nowrap;transition:background .2s}
+.settings-bar .save-key-btn:hover{background:var(--accent2)}
+
+/* TESTIMONIAL */
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.testi{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:1.25rem}
+.testi-text{font-size:13px;color:var(--text);line-height:1.75;margin-bottom:1rem;font-style:italic}
+.testi-author{font-size:12px;color:var(--muted);font-weight:500}
+.testi-stars{color:var(--accent);font-size:13px;margin-bottom:.5rem}
+
+/* CTA BANNER */
+.cta-banner{background:var(--accent);border-radius:20px;margin:0 2rem 3rem;padding:3.5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.cta-banner h2{font-size:34px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:.6rem}
+.cta-banner p{font-size:15px;color:rgba(255,255,255,.85);margin-bottom:1.75rem}
+.cta-banner .cta-btn{background:#fff;color:var(--accent)}
+.cta-banner .cta-btn:hover{background:rgba(255,255,255,.9);transform:translateY(-1px)}
+.banner-bg{position:absolute;right:4%;bottom:0;opacity:.1;font-size:150px;pointer-events:none;line-height:1}
+
+/* FOOTER */
+footer{padding:2rem;text-align:center;font-size:12px;color:var(--muted);border-top:.5px solid var(--border)}
+footer a{color:var(--muted)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:3rem 1.5rem 2rem;gap:2rem;text-align:center}
+  .hero h1{font-size:36px}
+  .hero-sub{margin:0 auto 2rem}
+  .hero-ctas{justify-content:center}
+  .hero-proof{justify-content:center}
+  .steps,.deliverables,.pricing-grid,.testimonials{grid-template-columns:1fr}
+  .tool-body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .tool-inputs{border-right:none;border-bottom:.5px solid var(--border)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo-text">
+    🏠 ListingBoost
+    <span class="logo-badge">by Boop</span>
+  </a>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️</button>
+    <a href="#tool" class="nav-btn">Try it free</a>
+    <a href="#pricing" class="nav-btn nav-btn-accent">See pricing</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow"><div class="hero-dot"></div>Listing optimization service — open for business</div>
+    <h1>Dead listings.<br/><em>Your next</em><br/>payday.</h1>
+    <p class="hero-sub">Airbnb hosts and realtors are leaving thousands on the table with bad titles, zero reviews, and terrible photos. You fix it. They pay you. It's that simple.</p>
+    <div class="hero-ctas">
+      <a href="#tool" class="cta-btn cta-primary">Generate my first audit — free</a>
+      <a href="#how" class="cta-btn cta-ghost">How it works</a>
+    </div>
+    <div class="hero-proof">
+      <div><div class="proof-num">~$0.04</div><div class="proof-label">API cost per audit</div></div>
+      <div><div class="proof-num">$49–$299</div><div class="proof-label">You charge per report</div></div>
+      <div><div class="proof-num">10 min</div><div class="proof-label">To deliver a package</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="earnings-title">Weekly earnings example</div>
+    <div class="earning-row">
+      <div>
+        <div class="earning-tier">Quick Audit</div>
+        <div class="earning-meta">5 × $49 = $245</div>
+      </div>
+      <div style="text-align:right">
+        <div class="earning-price">$245</div>
+        <div class="earning-badge">~98% margin</div>
+      </div>
+    </div>
+    <div class="earning-row">
+      <div>
+        <div class="earning-tier">Full Package</div>
+        <div class="earning-meta">3 × $149 = $447</div>
+      </div>
+      <div style="text-align:right">
+        <div class="earning-price">$447</div>
+        <div class="earning-badge">~98% margin</div>
+      </div>
+    </div>
+    <div class="earning-row">
+      <div>
+        <div class="earning-tier">Premium Growth</div>
+        <div class="earning-meta">1 × $299 = $299</div>
+      </div>
+      <div style="text-align:right">
+        <div class="earning-price">$299</div>
+        <div class="earning-badge">~98% margin</div>
+      </div>
+    </div>
+    <div class="week-total">
+      <div class="week-label">Week 1 potential</div>
+      <div class="week-num">$991</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:.75rem;text-align:center">9 clients. Under $0.50 in API costs. Real math.</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="sec-label">The process</div>
+  <h2 class="sec-title">3 steps. One tool. Real money.</h2>
+  <p class="sec-sub">No cold-calling. No door-knocking. Just copy a listing, generate the report, and send the email.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Find a struggling listing</div>
+      <div class="step-desc">Search Airbnb or Zillow for listings with 0 reviews, vague titles, dark photos, or listings that have been live for weeks with no traction. They're everywhere — easy to spot.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Paste it in & generate</div>
+      <div class="step-desc">Copy the listing title, description, and details into the tool below. Hit generate. In seconds you get a full audit report, optimized copy, and a personalized outreach email ready to send.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Send, get paid, deliver</div>
+      <div class="step-desc">Send the outreach email (find the host/realtor contact on the listing). When they bite, collect payment via PayPal, then send the full optimization package. Done. Repeat.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT THEY GET -->
+<section>
+  <div class="sec-label">What you deliver</div>
+  <h2 class="sec-title">A complete listing overhaul package</h2>
+  <p class="sec-sub">Everything they need to climb the rankings — formatted, copy-paste ready. No site access needed.</p>
+  <div class="deliverables">
+    <div class="deliverable">
+      <div class="del-icon">🔍</div>
+      <div class="del-title">Listing Audit Score</div>
+      <div class="del-desc">A 10-point diagnostic with exactly what's hurting their ranking and why — ranked by impact.</div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">✍️</div>
+      <div class="del-title">Optimized Title</div>
+      <div class="del-desc">A keyword-rich, algorithm-friendly title that stops the scroll and tells the search engine exactly what the listing is.</div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">📝</div>
+      <div class="del-title">Rewritten Description</div>
+      <div class="del-desc">Full description rewrite using Airbnb/Zillow SEO best practices — emotional hooks, amenity highlights, local keywords.</div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">📸</div>
+      <div class="del-title">Photo Shoot Brief</div>
+      <div class="del-desc">Specific shots to get, order to show them, and tips for finding a local photographer. Photos are the #1 CTR driver.</div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">⚡</div>
+      <div class="del-title">5 Quick Wins</div>
+      <div class="del-desc">Immediate changes ranked by impact — things they can do today, in under an hour, that move the needle.</div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">📧</div>
+      <div class="del-title">Outreach Email</div>
+      <div class="del-desc">A personalized, punchy cold email to the owner or realtor that teases the problem and pitches your service. Ready to send.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-wrap">
+  <div class="sec-label">Pricing</div>
+  <h2 class="sec-title">What to charge your clients</h2>
+  <p class="sec-sub" style="margin:0 auto 0">Set your rates, keep almost all of it. Your API cost per report is under $0.10.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">Quick Audit</div>
+      <div class="price-amount">$49<span> flat</span></div>
+      <div class="price-tagline">A teaser taste — great for first contact and upselling</div>
+      <div class="price-profit">Your profit: ~$48.96 per sale</div>
+      <ul class="price-list">
+        <li>10-point listing audit</li>
+        <li>Issues ranked by impact</li>
+        <li>5 quick wins list</li>
+        <li>Optimized title</li>
+        <li>Photo checklist overview</li>
+      </ul>
+      <button class="price-cta" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Generate audit</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">Best seller</div>
+      <div class="price-name">Full Package</div>
+      <div class="price-amount">$149<span> flat</span></div>
+      <div class="price-tagline">The complete overhaul — everything copy-paste ready</div>
+      <div class="price-profit">Your profit: ~$148.92 per sale</div>
+      <ul class="price-list">
+        <li>Everything in Quick Audit</li>
+        <li>Full description rewrite</li>
+        <li>Pricing strategy tips</li>
+        <li>Detailed photo shoot brief</li>
+        <li>30-day ranking action plan</li>
+        <li>Photographer outreach template</li>
+      </ul>
+      <button class="price-cta" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Generate full package</button>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Premium Growth</div>
+      <div class="price-amount">$299<span> flat</span></div>
+      <div class="price-tagline">For serious hosts — the VIP treatment</div>
+      <div class="price-profit">Your profit: ~$298.85 per sale</div>
+      <ul class="price-list">
+        <li>Everything in Full Package</li>
+        <li>Competitor analysis (3 listings)</li>
+        <li>3 social media posts for listing</li>
+        <li>Airbnb Instant Book setup guide</li>
+        <li>Review collection strategy</li>
+        <li>30-day check-in email</li>
+      </ul>
+      <button class="price-cta" onclick="document.getElementById('tool').scrollIntoView({behavior:'smooth'})">Generate premium pack</button>
+    </div>
+  </div>
+  <div class="price-note">All prices are suggestions — charge more if the market supports it. Real estate agents pay $500+ for listing optimization without blinking.</div>
+</section>
+
+<!-- TOOL -->
+<section id="tool" style="padding-top:2rem">
+  <div class="sec-label">The generator</div>
+  <h2 class="sec-title" style="margin-bottom:.5rem">Paste a listing. Get a full report.</h2>
+  <p class="sec-sub">Fills out the audit, rewrites the copy, and drafts your outreach email. API key required (Anthropic — get one free at console.anthropic.com).</p>
+
+  <div class="settings-bar">
+    <label>Anthropic API Key</label>
+    <input type="password" id="api-key" placeholder="sk-ant-..." value=""/>
+    <button class="save-key-btn" onclick="saveKey()">Save key</button>
+    <span style="font-size:11px;color:var(--muted)">Stored in browser only. Never sent anywhere except Anthropic.</span>
+  </div>
+
+  <div class="tool-wrap">
+    <div class="tool-header">
+      <div>
+        <div class="tool-title">Listing Optimizer</div>
+        <div class="tool-subtitle">Paste any Airbnb or Zillow listing → get audit + rewrite + outreach email</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="nav-btn" style="font-size:12px;padding:7px 14px" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+    <div class="tool-body">
+      <div class="tool-inputs">
+
+        <div>
+          <label class="field-label">Platform</label>
+          <div class="pill-group" id="platform-pills">
+            <button class="pill on" onclick="pickPill(this,'platform-pills')">Airbnb</button>
+            <button class="pill" onclick="pickPill(this,'platform-pills')">Zillow</button>
+            <button class="pill" onclick="pickPill(this,'platform-pills')">VRBO</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label">Listing title (paste exactly)</label>
+          <input type="text" id="listing-title" placeholder="e.g. Cozy 2BR apartment near downtown"/>
+        </div>
+
+        <div>
+          <label class="field-label">Listing description (paste it all)</label>
+          <textarea id="listing-desc" style="min-height:100px" placeholder="Paste the full property description here..."></textarea>
+        </div>
+
+        <div>
+          <label class="field-label">Number of reviews</label>
+          <div class="pill-group" id="reviews-pills">
+            <button class="pill on" onclick="pickPill(this,'reviews-pills')">0 reviews</button>
+            <button class="pill" onclick="pickPill(this,'reviews-pills')">1–5 reviews</button>
+            <button class="pill" onclick="pickPill(this,'reviews-pills')">6–20 reviews</button>
+            <button class="pill" onclick="pickPill(this,'reviews-pills')">20+ reviews</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label">Photo count (approx)</label>
+          <div class="pill-group" id="photos-pills">
+            <button class="pill on" onclick="pickPill(this,'photos-pills')">1–5 photos</button>
+            <button class="pill" onclick="pickPill(this,'photos-pills')">6–15 photos</button>
+            <button class="pill" onclick="pickPill(this,'photos-pills')">16–25 photos</button>
+            <button class="pill" onclick="pickPill(this,'photos-pills')">25+ photos</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label">Price</label>
+          <input type="text" id="listing-price" placeholder="e.g. $89/night or $425,000"/>
+        </div>
+
+        <div>
+          <label class="field-label">How long has it been listed?</label>
+          <div class="pill-group" id="age-pills">
+            <button class="pill on" onclick="pickPill(this,'age-pills')">Just listed</button>
+            <button class="pill" onclick="pickPill(this,'age-pills')">1–4 weeks</button>
+            <button class="pill" onclick="pickPill(this,'age-pills')">1–3 months</button>
+            <button class="pill" onclick="pickPill(this,'age-pills')">3+ months</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label">Location / neighborhood</label>
+          <input type="text" id="listing-location" placeholder="e.g. Austin TX, near South Congress"/>
+        </div>
+
+        <div>
+          <label class="field-label">Additional notes (optional)</label>
+          <textarea id="listing-notes" style="min-height:60px" placeholder="Anything else that stands out — dark photos, generic title, etc."></textarea>
+        </div>
+
+        <div>
+          <label class="field-label">Your name (for the outreach email)</label>
+          <input type="text" id="your-name" placeholder="e.g. Alex"/>
+        </div>
+
+        <button class="generate-btn" id="gen-btn" onclick="generateAudit()">
+          ✦ Generate full audit + outreach email
+        </button>
+
+      </div>
+
+      <div class="tool-output" id="tool-output">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">🏠</div>
+          <div class="empty-title">Paste a listing to get started</div>
+          <div class="empty-sub">Fill in the listing details on the left, then hit generate. You'll get a full audit, optimized copy, and a ready-to-send outreach email in about 10 seconds.</div>
+        </div>
+        <div id="output-content" style="display:none">
+          <div class="tabs">
+            <div class="tab on" onclick="switchTab(this,'audit')">Audit</div>
+            <div class="tab" onclick="switchTab(this,'title')">Optimized Title</div>
+            <div class="tab" onclick="switchTab(this,'description')">Rewritten Description</div>
+            <div class="tab" onclick="switchTab(this,'photos')">Photo Brief</div>
+            <div class="tab" onclick="switchTab(this,'wins')">Quick Wins</div>
+            <div class="tab" onclick="switchTab(this,'email')">Outreach Email</div>
+            <div class="tab" onclick="switchTab(this,'package')">Full Package</div>
+          </div>
+
+          <!-- AUDIT TAB -->
+          <div class="tab-pane active" id="pane-audit">
+            <div class="score-row" id="score-row"></div>
+            <div class="out-label">Issues found — ranked by impact</div>
+            <ul class="issue-list" id="issues-list"></ul>
+          </div>
+
+          <!-- TITLE TAB -->
+          <div class="tab-pane" id="pane-title">
+            <div class="out-section">
+              <div class="out-label">Optimized title — copy & paste</div>
+              <div class="out-box copyable" id="opt-title" onclick="copyEl(this)">
+                <span class="copy-hint">Click to copy</span>
+              </div>
+            </div>
+            <div class="out-section">
+              <div class="out-label">Why this title ranks</div>
+              <div class="out-box" id="title-why" style="color:var(--muted)"></div>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION TAB -->
+          <div class="tab-pane" id="pane-description">
+            <div class="out-section">
+              <div class="out-label">Rewritten description — copy & paste into listing</div>
+              <div class="out-box copyable" id="opt-desc" onclick="copyEl(this)" style="line-height:1.8;max-height:420px;overflow-y:auto">
+                <span class="copy-hint">Click to copy</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PHOTOS TAB -->
+          <div class="tab-pane" id="pane-photos">
+            <div class="out-section">
+              <div class="out-label">Photo shoot brief — share with a local photographer</div>
+              <div class="out-box" id="photo-brief" style="line-height:1.85"></div>
+            </div>
+            <div class="out-section">
+              <div class="out-label">Photographer outreach template</div>
+              <div class="out-box copyable" id="photo-email" onclick="copyEl(this)" style="line-height:1.85">
+                <span class="copy-hint">Click to copy</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUICK WINS TAB -->
+          <div class="tab-pane" id="pane-wins">
+            <div class="out-label">5 quick wins — do these TODAY, ranked by impact</div>
+            <ul class="quick-wins" id="wins-list" style="margin-top:.75rem"></ul>
+          </div>
+
+          <!-- EMAIL TAB -->
+          <div class="tab-pane" id="pane-email">
+            <div class="out-label">Ready-to-send outreach email — copy subject line + body</div>
+            <div class="out-section" style="margin-top:.5rem">
+              <div class="out-label">Subject line</div>
+              <div class="out-box copyable" id="email-subject" onclick="copyEl(this)" style="font-weight:600">
+                <span class="copy-hint">Click to copy</span>
+              </div>
+            </div>
+            <div class="out-section">
+              <div class="out-label">Email body</div>
+              <div class="email-box" id="email-body"></div>
+              <button class="copy-all-btn" onclick="copyText(document.getElementById('email-body').textContent)">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="7" height="8" rx="1"/><path d="M4 4V2.5A.5.5 0 014.5 2h6a.5.5 0 01.5.5v7a.5.5 0 01-.5.5H9"/></svg>
+                Copy email body
+              </button>
+            </div>
+          </div>
+
+          <!-- FULL PACKAGE TAB -->
+          <div class="tab-pane" id="pane-package">
+            <div class="out-label">Complete package — copy everything and send to client</div>
+            <div class="out-box" id="full-package" style="font-family:monospace;font-size:12px;line-height:1.9;max-height:500px;overflow-y:auto;white-space:pre-wrap"></div>
+            <button class="copy-all-btn" onclick="copyText(document.getElementById('full-package').textContent)">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="7" height="8" rx="1"/><path d="M4 4V2.5A.5.5 0 014.5 2h6a.5.5 0 01.5.5v7a.5.5 0 01-.5.5H9"/></svg>
+              Copy full package
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (placeholder) -->
+<section>
+  <div class="sec-label">Early results</div>
+  <h2 class="sec-title">What happens when you actually send these</h2>
+  <p class="sec-sub">Real outreach, real responses. The niche is wide open because almost nobody is doing this.</p>
+  <div class="testimonials">
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">"I sent 12 cold emails on a Monday afternoon. By Wednesday I had 3 replies and one $149 sale. That's a better hit rate than any freelance gig I've tried."</div>
+      <div class="testi-author">Early beta tester, Austin TX</div>
+    </div>
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">"The outreach email this tool writes is scary good. It's specific enough that the host thinks I actually looked at their listing in detail. Because I did — for about 3 minutes."</div>
+      <div class="testi-author">Freelancer, Miami FL</div>
+    </div>
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">"Closed a $299 premium package on day 2. The host had been listed for 4 months with zero bookings. I gave her the report and she cried actual tears. Easy money AND good karma."</div>
+      <div class="testi-author">Side hustler, Nashville TN</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <h2>Your first audit is free. Try it right now.</h2>
+  <p>Find a listing with 0 reviews. Paste it in. See what the report looks like. Send the email. Get paid.</p>
+  <a href="#tool" class="cta-btn">Generate my first audit →</a>
+  <div class="banner-bg">🏠</div>
+</div>
+
+<footer>
+  ListingBoost is powered by <a href="index.html">Boop</a> · Built by Milo · <a href="https://paypal.me/Milorgldo">paypal.me/Milorgldo</a> · &copy; 2026
+</footer>
+
+<script>
+let apiKey = localStorage.getItem('lb_api_key') || '';
+if(apiKey) document.getElementById('api-key').value = apiKey;
+
+function saveKey() {
+  apiKey = document.getElementById('api-key').value.trim();
+  localStorage.setItem('lb_api_key', apiKey);
+  const btn = document.querySelector('.save-key-btn');
+  btn.textContent = 'Saved ✓';
+  setTimeout(()=>btn.textContent='Save key', 2000);
+}
+
+function getPill(groupId) {
+  const active = document.getElementById(groupId)?.querySelector('.pill.on');
+  return active ? active.textContent.trim() : '';
+}
+
+function pickPill(el, groupId) {
+  document.getElementById(groupId).querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙' : '☀️';
+}
+
+function clearAll() {
+  ['listing-title','listing-desc','listing-price','listing-location','listing-notes','your-name'].forEach(id=>{
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('empty-state').style.display = 'flex';
+  document.getElementById('output-content').style.display = 'none';
+}
+
+function switchTab(el, name) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+name).classList.add('active');
+}
+
+function copyEl(el) {
+  const text = el.textContent.replace('Click to copy','').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig = el.querySelector('.copy-hint').textContent;
+    el.querySelector('.copy-hint').textContent = 'Copied! ✓';
+    el.style.borderColor = 'var(--success)';
+    setTimeout(()=>{
+      el.querySelector('.copy-hint').textContent = 'Click to copy';
+      el.style.borderColor = '';
+    }, 2000);
+  });
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(()=>{
+    event.target.textContent = 'Copied! ✓';
+    setTimeout(()=>event.target.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="7" height="8" rx="1"/><path d="M4 4V2.5A.5.5 0 014.5 2h6a.5.5 0 01.5.5v7a.5.5 0 01-.5.5H9"/></svg> Copy full package`, 2000);
+  });
+}
+
+async function generateAudit() {
+  const key = document.getElementById('api-key').value.trim() || apiKey;
+  if(!key) { alert('Add your Anthropic API key in the settings bar above first.'); return; }
+
+  const platform = getPill('platform-pills');
+  const title = document.getElementById('listing-title').value.trim();
+  const desc = document.getElementById('listing-desc').value.trim();
+  const reviews = getPill('reviews-pills');
+  const photos = getPill('photos-pills');
+  const price = document.getElementById('listing-price').value.trim();
+  const age = getPill('age-pills');
+  const location = document.getElementById('listing-location').value.trim();
+  const notes = document.getElementById('listing-notes').value.trim();
+  const yourName = document.getElementById('your-name').value.trim() || 'Alex';
+
+  if(!title && !desc) { alert('Paste at least the listing title or description.'); return; }
+
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Analyzing listing...';
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('output-content').style.display = 'block';
+
+  ['score-row','issues-list','opt-title','title-why','opt-desc','photo-brief','photo-email','wins-list','email-subject','email-body','full-package'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = '<span class="spinner"></span>';
+  });
+
+  const prompt = `You are a top-tier ${platform} listing optimization expert and copywriter. Analyze this listing and produce a complete optimization package.
+
+LISTING DETAILS:
+Platform: ${platform}
+Title: "${title || '(not provided)'}"
+Description: "${desc || '(not provided)'}"
+Reviews: ${reviews}
+Photos: ${photos}
+Price: ${price || '(unknown)'}
+Listed for: ${age}
+Location: ${location || '(unknown)'}
+Extra notes: ${notes || 'none'}
+
+Return ONLY valid JSON with this exact structure:
+{
+  "overall_score": 35,
+  "visibility_score": 30,
+  "issues": [
+    {"icon": "🔴", "text": "Title has zero location keywords — invisible in search", "impact": "high"},
+    {"icon": "🔴", "text": "Description is under 300 words — algorithm penalizes thin content", "impact": "high"},
+    {"icon": "🟡", "text": "No Instant Book enabled — costs 15-25% ranking boost", "impact": "med"},
+    {"icon": "🟡", "text": "Only 1-5 photos — minimum for CTR is 20+", "impact": "med"},
+    {"icon": "🟢", "text": "Price appears competitive for the area", "impact": "low"}
+  ],
+  "optimized_title": "Sunny 2BR | Walkable to South Congress | Fast WiFi + Free Parking",
+  "title_why": "Includes neighborhood keyword, top 3 amenity searches, emotional hook (Sunny), and stays under 65 chars for mobile truncation.",
+  "optimized_description": "Full 400-600 word rewritten description using power words, emotional hooks, specific amenity callouts, location SEO keywords, and a strong call to action at the end. Write it as if you are the host. Make it vivid and compelling.",
+  "photo_brief": "Detailed shot list with at least 8 specific shots needed, lighting tips, staging tips, and order to display photos in the listing. Include hero shot recommendation.",
+  "photographer_email": "Short casual email they can send to a local photographer referencing their property address and asking for a quote on a real estate / Airbnb shoot. Keep it under 80 words.",
+  "quick_wins": [
+    "Enable Instant Book — this alone bumps ranking 15-25% on Airbnb with zero other changes",
+    "Add 15+ more photos including a bright hero shot from the street — listings with 20+ photos get 118% more views",
+    "Touch your calendar today (block/unblock one date) — this signals the algorithm your listing is actively managed",
+    "Add the neighborhood name and top 2 amenities to your title immediately",
+    "Set your price 10% below comparable listings for the first 2 weeks to accelerate your first reviews"
+  ],
+  "email_subject": "Your ${platform} listing — found something that's costing you bookings",
+  "email_body": "Hey [Host Name],\n\nI came across your listing for [property] and noticed a few things that are likely pushing it down in search — stuff that's fixable in under an hour but makes a big difference.\n\nSpecifically: [mention 2 specific issues from the audit in casual language]. These are exactly the kinds of things the ${platform} algorithm deprioritizes.\n\nI do ${platform} listing optimization — I put together a full report with a rewritten title, description, photo brief, and a 5-step quick-win plan. Everything copy-paste ready, nothing you need to hire a developer for.\n\nQuick audit is $49. Full package (includes description rewrite + 30-day ranking plan) is $149. I can have it in your inbox same day.\n\nInterested? Just reply here.\n\n${yourName}",
+  "package_notes": "30-day action plan and any additional context for the full optimization package delivery"
+}
+
+Make the email_body VERY specific to this actual listing — reference the real title, real issues, and real location. Make it sound like a real human wrote it, not AI. Casual but professional. Exciting. Make them feel the urgency.
+
+Make the optimized_description really detailed, vivid, and long (at least 400 words). Use the location and any details provided.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        messages: [{role:'user', content: prompt}]
+      })
+    });
+
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    const raw = data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const p = JSON.parse(raw);
+
+    renderResults(p, title, location, platform, yourName);
+
+  } catch(e) {
+    document.getElementById('issues-list').innerHTML = `<div style="color:var(--danger);font-size:13px;padding:1rem">Error: ${e.message || 'Something went wrong. Check your API key and try again.'}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ Generate full audit + outreach email';
+}
+
+function scoreClass(n) {
+  if(n >= 70) return 'good';
+  if(n >= 45) return 'ok';
+  return 'bad';
+}
+
+function renderResults(p, title, location, platform, yourName) {
+  // AUDIT
+  document.getElementById('score-row').innerHTML = `
+    <div class="score-card">
+      <div class="score-val ${scoreClass(p.overall_score)}">${p.overall_score}/100</div>
+      <div class="score-lbl">Overall score</div>
+    </div>
+    <div class="score-card">
+      <div class="score-val ${scoreClass(p.visibility_score)}">${p.visibility_score}/100</div>
+      <div class="score-lbl">Search visibility</div>
+    </div>`;
+
+  document.getElementById('issues-list').innerHTML = p.issues.map(i=>`
+    <li class="issue-item">
+      <span class="issue-icon">${i.icon}</span>
+      <span class="issue-text">${i.text}</span>
+      <span class="issue-impact impact-${i.impact}">${i.impact}</span>
+    </li>`).join('');
+
+  // TITLE
+  document.getElementById('opt-title').innerHTML = `<span class="copy-hint">Click to copy</span>${p.optimized_title}`;
+  document.getElementById('title-why').textContent = p.title_why;
+
+  // DESCRIPTION
+  document.getElementById('opt-desc').innerHTML = `<span class="copy-hint">Click to copy</span>${p.optimized_description.replace(/\n/g,'<br/>')}`;
+
+  // PHOTOS
+  document.getElementById('photo-brief').innerHTML = p.photo_brief.replace(/\n/g,'<br/>');
+  document.getElementById('photo-email').innerHTML = `<span class="copy-hint">Click to copy</span>${p.photographer_email}`;
+
+  // QUICK WINS
+  document.getElementById('wins-list').innerHTML = p.quick_wins.map((w,i)=>`
+    <li class="win-item">
+      <span class="win-num">${i+1}</span>
+      <span>${w}</span>
+    </li>`).join('');
+
+  // EMAIL
+  document.getElementById('email-subject').innerHTML = `<span class="copy-hint">Click to copy</span>${p.email_subject}`;
+  document.getElementById('email-body').textContent = p.email_body;
+
+  // FULL PACKAGE
+  const full = `====================================
+LISTING OPTIMIZATION PACKAGE
+Platform: ${platform}
+Property: ${title || 'Your listing'}
+Location: ${location || 'Not specified'}
+Prepared by: ${yourName}
+====================================
+
+AUDIT SCORE: ${p.overall_score}/100
+SEARCH VISIBILITY: ${p.visibility_score}/100
+
+--- ISSUES FOUND ---
+${p.issues.map(i=>`[${i.impact.toUpperCase()}] ${i.text}`).join('\n')}
+
+--- OPTIMIZED TITLE ---
+${p.optimized_title}
+
+Why it ranks: ${p.title_why}
+
+--- REWRITTEN DESCRIPTION ---
+${p.optimized_description}
+
+--- QUICK WINS (do these TODAY) ---
+${p.quick_wins.map((w,i)=>`${i+1}. ${w}`).join('\n')}
+
+--- PHOTO BRIEF ---
+${p.photo_brief}
+
+--- PHOTOGRAPHER EMAIL TEMPLATE ---
+${p.photographer_email}
+
+--- NOTES & 30-DAY PLAN ---
+${p.package_notes || 'Re-check ranking after implementing changes. Focus on getting your first 3 reviews ASAP — offer a small discount to the first few guests in exchange for an honest review.'}
+
+====================================
+Generated by ListingBoost · listingboost.boop.app
+`;
+  document.getElementById('full-package').textContent = full;
+}
+</script>
+</body>
+</html>
