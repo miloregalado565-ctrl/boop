@@ -513,6 +513,8 @@ footer a:hover{color:var(--accent)}
 const PAYPAL_ME = 'https://paypal.me/Milorgldo';
 const PLAN_PRICES = { 1: 19, 2: 27, 3: 34 };
 const PLAN_LABELS = { 1: '$19 — Single analysis', 2: '$27 — Analysis + 1 redo', 3: '$34 — Analysis + 2 redos' };
+const OWNER_EMAIL = 'miloregalado565@gmail.com';
+function isOwner() { return getSession() === OWNER_EMAIL; }
 
 // ─── STATE ───
 let selectedPlan = 1;
@@ -807,6 +809,7 @@ function clearResults() {
 }
 
 function showPaywall() {
+  if (isOwner()) { unlockResults(); return; }
   document.getElementById('results-inner').classList.add('blurred');
   document.getElementById('paywall-overlay').classList.add('show');
   document.getElementById('pay-price').innerHTML = `$${PLAN_PRICES[jobState?.plan || selectedPlan]}<span> one time</span>`;
