@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ListingAI — Turn Any Listing Into a Booking Machine</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root[data-theme="dark"]{
+  --bg:#090909;--bg2:#0f0f0f;--surface:#131313;--surface2:#1a1a1a;--surface3:#222;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);--border3:rgba(255,255,255,.2);
+  --text:#efefef;--muted:#777;--muted2:#444;
+  --accent:#ff6b35;--accent2:#ff8f65;--accent-bg:rgba(255,107,53,.1);--accent-border:rgba(255,107,53,.25);
+  --success:#3ecf8e;--success-bg:rgba(62,207,142,.1);
+  --warn:#f5a623;--warn-bg:rgba(245,166,35,.1);
+  --danger:#f05252;
+  --blur-color:rgba(9,9,9,.92);
+  --r:12px;--r-sm:8px;--r-xs:6px;
+}
+:root[data-theme="light"]{
+  --bg:#f5f2ee;--bg2:#edeae4;--surface:#fff;--surface2:#f0ede8;--surface3:#e8e4dd;
+  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);--border3:rgba(0,0,0,.22);
+  --text:#1a1a1a;--muted:#888;--muted2:#bbb;
+  --accent:#ff6b35;--accent2:#ff8f65;--accent-bg:rgba(255,107,53,.08);--accent-border:rgba(255,107,53,.2);
+  --success:#1a9955;--success-bg:rgba(26,153,85,.08);
+  --warn:#b07a00;--warn-bg:rgba(176,122,0,.08);
+  --danger:#e03030;
+  --blur-color:rgba(245,242,238,.95);
+  --r:12px;--r-sm:8px;--r-xs:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;transition:background .3s,color .3s;overflow-x:hidden;min-height:100vh}
+h1,h2,h3,.syne{font-family:'Syne',sans-serif}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ─── NAV ─── */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2rem;position:sticky;top:0;z-index:90;background:var(--bg);border-bottom:.5px solid var(--border);backdrop-filter:blur(10px)}
+.logo{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--accent);letter-spacing:-.4px;display:flex;align-items:center;gap:8px}
+.logo-chip{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--accent-bg);border:.5px solid var(--accent-border);color:var(--accent);font-family:'DM Sans',sans-serif;font-weight:600;letter-spacing:.04em}
+.nav-r{display:flex;gap:8px;align-items:center}
+.nav-btn{padding:7px 16px;border-radius:99px;border:.5px solid var(--border2);background:transparent;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;transition:all .18s}
+.nav-btn:hover{background:var(--surface2)}
+.nav-btn-accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-btn-accent:hover{background:var(--accent2);border-color:var(--accent2)}
+.nav-user{display:none;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.nav-user .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-bg);border:.5px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent)}
+.theme-btn{width:34px;height:34px;border-radius:50%;border:.5px solid var(--border2);background:transparent;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.theme-btn:hover{background:var(--surface2);color:var(--text)}
+
+/* ─── AUTH MODAL ─── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--surface);border:.5px solid var(--border2);border-radius:20px;padding:2rem;width:100%;max-width:400px;position:relative}
+.modal-close{position:absolute;top:1rem;right:1rem;width:30px;height:30px;border-radius:50%;border:.5px solid var(--border);background:transparent;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+.modal-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:.35rem}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+.modal-tabs{display:flex;border-bottom:.5px solid var(--border);margin-bottom:1.25rem}
+.modal-tab{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;padding:7px 16px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-.5px;transition:all .15s}
+.modal-tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.field{margin-bottom:.9rem}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem}
+input[type=text],input[type=email],input[type=password],textarea,select{width:100%;padding:9px 12px;font-size:13px;border-radius:var(--r-sm);border:.5px solid var(--border2);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border .15s;line-height:1.6}
+input:focus,textarea:focus,select:focus{border-color:var(--accent-border)}
+textarea{resize:vertical}
+.auth-btn{width:100%;padding:11px;border-radius:99px;background:var(--accent);color:#fff;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;transition:background .18s;margin-top:.25rem}
+.auth-btn:hover{background:var(--accent2)}
+.auth-err{font-size:12px;color:var(--danger);margin-top:.5rem;display:none}
+.auth-switch{font-size:12px;color:var(--muted);text-align:center;margin-top:1rem}
+.auth-switch span{color:var(--accent);cursor:pointer;font-weight:500}
+.auth-switch span:hover{text-decoration:underline}
+
+/* ─── HERO ─── */
+.hero{max-width:700px;margin:0 auto;padding:5.5rem 2rem 4rem;text-align:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);color:var(--accent);font-size:12px;font-weight:600;padding:5px 13px;border-radius:99px;margin-bottom:1.5rem;border:.5px solid var(--accent-border)}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:1.25rem}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--muted);line-height:1.8;margin-bottom:2rem;max-width:520px;margin-left:auto;margin-right:auto}
+.hero-cta-wrap{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta{padding:13px 28px;border-radius:99px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;border:none;transition:all .2s}
+.cta-fill{background:var(--accent);color:#fff}
+.cta-fill:hover{background:var(--accent2);transform:translateY(-1px)}
+.cta-outline{background:transparent;color:var(--text);border:.5px solid var(--border2)!important;border:none}
+.cta-outline:hover{background:var(--surface)}
+.hero-stats{display:flex;gap:2.5rem;justify-content:center;margin-top:3rem;flex-wrap:wrap}
+.stat-n{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text)}
+.stat-l{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* ─── TOOL CARD ─── */
+.tool-section{max-width:760px;margin:0 auto 4rem;padding:0 1.5rem}
+.tool-card{background:var(--surface);border:.5px solid var(--border2);border-radius:20px;overflow:hidden}
+.tool-head{padding:1.5rem 1.75rem;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:1rem}
+.tool-head-icon{width:44px;height:44px;border-radius:12px;background:var(--accent-bg);border:.5px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.tool-head-text h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
+.tool-head-text p{font-size:12px;color:var(--muted);margin-top:2px}
+.tool-body{padding:1.75rem}
+
+/* Step labels */
+.step-label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem;display:flex;align-items:center;gap:6px}
+.step-label::before{content:attr(data-n);width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tool-step{margin-bottom:1.5rem}
+
+/* URL input row */
+.url-row{display:flex;gap:8px}
+.url-row input{flex:1}
+.fetch-btn{padding:9px 16px;border-radius:var(--r-sm);background:var(--surface2);border:.5px solid var(--border2);color:var(--muted);font-size:12px;font-weight:600;transition:all .18s;white-space:nowrap}
+.fetch-btn:hover{border-color:var(--border3);color:var(--text)}
+.fetch-status{font-size:11px;margin-top:.35rem;min-height:16px;transition:color .2s}
+.fetch-ok{color:var(--success)}
+.fetch-fail{color:var(--warn)}
+
+/* Plan picker */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.plan-card{border:.5px solid var(--border2);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .18s;position:relative;background:var(--bg2)}
+.plan-card:hover{border-color:var(--border3)}
+.plan-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.plan-card.selected .plan-price{color:var(--accent)}
+.plan-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem}
+.plan-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.plan-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--accent);color:#fff;font-weight:700}
+.plan-price{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:.2rem;transition:color .18s}
+.plan-save{font-size:11px;color:var(--success);font-weight:500}
+.plan-desc{font-size:11px;color:var(--muted);line-height:1.6;margin-top:.5rem}
+.plan-check{position:absolute;top:.75rem;right:.75rem;width:20px;height:20px;border-radius:50%;border:.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .18s}
+.plan-card.selected .plan-check{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Generate button */
+.gen-wrap{position:relative}
+.gen-btn{width:100%;padding:14px;border-radius:99px;background:var(--accent);color:#fff;border:none;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:-.2px;transition:all .2s}
+.gen-btn:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px)}
+.gen-btn:disabled{opacity:.5;transform:none;cursor:not-allowed}
+.gen-sub{font-size:11px;color:var(--muted);text-align:center;margin-top:.6rem}
+
+/* Spinner */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── RESULTS ─── */
+.results-wrap{position:relative;margin-top:1.75rem;border-top:.5px solid var(--border);padding-top:1.5rem}
+.results-inner{transition:filter .3s}
+.results-inner.blurred{filter:blur(7px);pointer-events:none;user-select:none}
+.results-tabs{display:flex;gap:0;border-bottom:.5px solid var(--border);margin-bottom:1.25rem;overflow-x:auto}
+.rtab{font-size:12px;padding:8px 14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-.5px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;white-space:nowrap;transition:all .15s}
+.rtab:hover{color:var(--text)}
+.rtab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.rpane{display:none}
+.rpane.on{display:block}
+.out-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+.out-box{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r-sm);padding:1rem;font-size:13px;color:var(--text);line-height:1.8;position:relative}
+.copy-btn{position:absolute;top:.6rem;right:.6rem;padding:4px 10px;border-radius:99px;border:.5px solid var(--border2);background:var(--surface);color:var(--muted);font-size:11px;font-family:'Syne',sans-serif;font-weight:600;transition:all .15s}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.score-banner{display:flex;align-items:center;gap:1rem;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r-sm);padding:1rem 1.25rem;margin-bottom:1rem}
+.score-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;border:3px solid;flex-shrink:0}
+.score-circle.low{border-color:var(--danger);color:var(--danger)}
+.score-circle.mid{border-color:var(--warn);color:var(--warn)}
+.score-circle.high{border-color:var(--success);color:var(--success)}
+.score-text h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.score-text p{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.issue-list,.win-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin-top:.5rem}
+.issue-item,.win-item{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.65;padding:.6rem .75rem;border-radius:var(--r-sm)}
+.issue-item{background:var(--surface2);border:.5px solid var(--border)}
+.win-item{background:var(--accent-bg);border:.5px solid var(--accent-border)}
+.issue-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.dot-high{background:var(--danger)}
+.dot-med{background:var(--warn)}
+.dot-low{background:var(--success)}
+.win-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.before-after{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.ba-box{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r-sm);padding:.85rem}
+.ba-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.ba-label.before{color:var(--danger)}
+.ba-label.after{color:var(--success)}
+.ba-text{font-size:13px;line-height:1.65}
+.kw-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:.5rem}
+.kw-chip{font-size:11px;padding:4px 10px;border-radius:99px;background:var(--surface2);border:.5px solid var(--border2);color:var(--muted)}
+.redo-bar{display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;padding:1rem 1.25rem;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r-sm)}
+.redo-info{font-size:12px;color:var(--muted)}
+.redo-info strong{color:var(--text)}
+.redo-btn{padding:8px 18px;border-radius:99px;background:var(--surface);border:.5px solid var(--border2);color:var(--text);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;transition:all .18s}
+.redo-btn:hover:not(:disabled){background:var(--accent);color:#fff;border-color:var(--accent)}
+.redo-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ─── PAYWALL OVERLAY ─── */
+.paywall-overlay{display:none;position:absolute;inset:0;z-index:10;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;background:linear-gradient(to bottom,transparent,var(--blur-color) 30%)}
+.paywall-overlay.show{display:flex}
+.paywall-card{background:var(--surface);border:.5px solid var(--border2);border-radius:20px;padding:2rem 1.75rem;max-width:380px;width:100%}
+.paywall-card h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:.4rem}
+.paywall-card p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1.5rem}
+.pay-amount{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--accent);margin-bottom:.15rem}
+.pay-amount span{font-size:13px;color:var(--muted);font-weight:400}
+.pay-btn{width:100%;padding:13px;border-radius:99px;background:var(--accent);color:#fff;border:none;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;transition:background .18s;margin-bottom:.75rem}
+.pay-btn:hover{background:var(--accent2)}
+.pay-note{font-size:11px;color:var(--muted);line-height:1.6}
+
+/* ─── DISCLAIMER ─── */
+.disclaimer-section{max-width:700px;margin:0 auto 4rem;padding:0 1.5rem}
+.disclaimer-card{background:var(--surface2);border:.5px solid var(--border);border-radius:16px;padding:1.5rem;font-size:12px;color:var(--muted);line-height:1.9}
+.disclaimer-card h4{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:.6rem}
+
+/* ─── FOOTER ─── */
+footer{border-top:.5px solid var(--border);padding:1.75rem 2rem;text-align:center;font-size:12px;color:var(--muted)}
+footer a{color:var(--muted);transition:color .15s}
+footer a:hover{color:var(--accent)}
+
+/* ─── SETTINGS PANEL ─── */
+.settings-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:.6rem;transition:color .15s;width:fit-content}
+.settings-toggle:hover{color:var(--text)}
+.settings-toggle svg{transition:transform .2s}
+.settings-toggle.open svg{transform:rotate(90deg)}
+.settings-panel{display:none;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--r-sm);padding:1rem;margin-bottom:1rem}
+.settings-panel.open{display:block}
+.api-row{display:flex;gap:8px;align-items:center}
+.api-row input{flex:1}
+.api-save{padding:8px 14px;border-radius:var(--r-xs);background:var(--accent);color:#fff;border:none;font-size:12px;font-weight:600;white-space:nowrap;transition:background .18s}
+.api-save:hover{background:var(--accent2)}
+.api-note{font-size:11px;color:var(--muted);margin-top:.35rem;line-height:1.6}
+
+@media(max-width:640px){
+  .hero h1{font-size:36px;letter-spacing:-1.5px}
+  .plan-grid{grid-template-columns:1fr}
+  .before-after{grid-template-columns:1fr}
+  nav{padding:.9rem 1.25rem}
+  .tool-body{padding:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── AUTH MODAL ─── -->
+<div class="modal-backdrop" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div class="modal-title">Create account</div>
+    <div class="modal-sub">Free to join. Required to generate your report.</div>
+    <div class="modal-tabs">
+      <div class="modal-tab on" id="tab-signup" onclick="switchAuthTab('signup')">Sign up</div>
+      <div class="modal-tab" id="tab-login" onclick="switchAuthTab('login')">Log in</div>
+    </div>
+    <div id="form-signup">
+      <div class="field"><label>Email</label><input type="email" id="su-email" placeholder="you@email.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="su-pass" placeholder="Min. 6 characters"/></div>
+      <div class="field"><label>Confirm password</label><input type="password" id="su-pass2" placeholder="Same as above"/></div>
+      <button class="auth-btn" onclick="doSignup()">Create account — it's free</button>
+      <div class="auth-err" id="su-err"></div>
+    </div>
+    <div id="form-login" style="display:none">
+      <div class="field"><label>Email</label><input type="email" id="li-email" placeholder="you@email.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="li-pass" placeholder="Your password"/></div>
+      <button class="auth-btn" onclick="doLogin()">Log in</button>
+      <div class="auth-err" id="li-err"></div>
+    </div>
+    <div class="auth-switch" id="auth-switch-txt">Already have an account? <span onclick="switchAuthTab('login')">Log in</span></div>
+  </div>
+</div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="logo">
+    🏠 ListingAI
+    <span class="logo-chip">BETA</span>
+  </div>
+  <div class="nav-r">
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
+    <div class="nav-user" id="nav-user">
+      <div class="avatar" id="nav-avatar">?</div>
+      <span id="nav-email-display"></span>
+      <button class="nav-btn" onclick="logout()" style="font-size:11px;padding:5px 12px">Log out</button>
+    </div>
+    <div id="nav-auth-btns">
+      <button class="nav-btn" onclick="openAuth('login')">Log in</button>
+      <button class="nav-btn nav-btn-accent" onclick="openAuth('signup')" style="margin-left:6px">Sign up free</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-eyebrow"><div class="hero-dot"></div>AI-powered · No fluff added · Copy-paste ready</div>
+  <h1>Your listing.<br/><em>Fully optimized.</em><br/>In 30 seconds.</h1>
+  <p class="hero-sub">Paste your Airbnb, Zillow, or VRBO listing link. Our AI reads the actual listing, finds what's hurting your ranking, and rewrites it — using only what's already there. No invented details. Ever.</p>
+  <div class="hero-cta-wrap">
+    <button class="cta cta-fill" onclick="document.getElementById('tool-section').scrollIntoView({behavior:'smooth'})">Optimize my listing now</button>
+    <button class="cta cta-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See how it works</button>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-n">100%</div><div class="stat-l">Your real content only</div></div>
+    <div><div class="stat-n">~30s</div><div class="stat-l">To full analysis</div></div>
+    <div><div class="stat-n">3×</div><div class="stat-l">Redo until perfect</div></div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="how-it-works" style="max-width:700px;margin:0 auto 4rem;padding:0 1.5rem">
+  <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">How it works</div>
+  <h2 class="syne" style="font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:2rem">Simple. Honest. Effective.</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+    <div style="background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:1.25rem">
+      <div style="font-size:24px;margin-bottom:.75rem">🔗</div>
+      <div class="syne" style="font-size:14px;font-weight:700;margin-bottom:.4rem">Paste your link</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">Drop in your listing URL. We'll try to fetch it automatically. If blocked, paste the text directly — your call.</div>
+    </div>
+    <div style="background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:1.25rem">
+      <div style="font-size:24px;margin-bottom:.75rem">🤖</div>
+      <div class="syne" style="font-size:14px;font-weight:700;margin-bottom:.4rem">AI reads your listing</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">It finds every weak spot — title keywords, description structure, buried amenities, SEO gaps — based only on what you provided.</div>
+    </div>
+    <div style="background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:1.25rem">
+      <div style="font-size:24px;margin-bottom:.75rem">📋</div>
+      <div class="syne" style="font-size:14px;font-weight:700;margin-bottom:.4rem">Copy. Paste. Done.</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">You get a rewritten title, new description, issue report, and action list — all ready to paste straight into your listing.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TOOL ─── -->
+<div class="tool-section" id="tool-section">
+  <div class="tool-card">
+    <div class="tool-head">
+      <div class="tool-head-icon">🏠</div>
+      <div class="tool-head-text">
+        <h2>Listing Optimizer</h2>
+        <p>Paste your listing → get a full rewrite and audit in seconds</p>
+      </div>
+    </div>
+    <div class="tool-body">
+
+      <!-- STEP 1: URL + CONTENT -->
+      <div class="tool-step">
+        <div class="step-label" data-n="1">Listing URL</div>
+        <div class="url-row">
+          <input type="text" id="listing-url" placeholder="https://www.airbnb.com/rooms/... or zillow.com/homedetails/..."/>
+          <button class="fetch-btn" onclick="fetchListing()" id="fetch-btn">Try to fetch →</button>
+        </div>
+        <div class="fetch-status" id="fetch-status"></div>
+      </div>
+
+      <div class="tool-step">
+        <div class="step-label" data-n="2">Listing content</div>
+        <textarea id="listing-content" style="min-height:120px" placeholder="Paste your full listing text here — title, description, amenities, everything. The more you give us, the better the rewrite. (Auto-filled if fetch works above.)"></textarea>
+      </div>
+
+      <div class="tool-step">
+        <div class="step-label" data-n="3">Additional details <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;font-size:10px">(optional)</span></div>
+        <textarea id="extra-notes" style="min-height:70px" placeholder="Anything the listing doesn't mention — unique features, target guest type, local attractions nearby, what makes it special. We'll use this to sharpen the rewrite."></textarea>
+      </div>
+
+      <!-- STEP 4: PLAN PICKER -->
+      <div class="tool-step">
+        <div class="step-label" data-n="4">Choose your plan</div>
+        <div class="plan-grid" id="plan-grid">
+          <div class="plan-card selected" data-plan="1" onclick="selectPlan(this)">
+            <div class="plan-top">
+              <div class="plan-name">Single</div>
+              <div class="plan-check">✓</div>
+            </div>
+            <div class="plan-price">$19</div>
+            <div class="plan-save">&nbsp;</div>
+            <div class="plan-desc">One full analysis. Good if your listing is mostly solid.</div>
+          </div>
+          <div class="plan-card" data-plan="2" onclick="selectPlan(this)">
+            <div class="plan-top">
+              <div class="plan-name">+ 1 Redo</div>
+              <div class="plan-check">✓</div>
+            </div>
+            <div class="plan-price">$27</div>
+            <div class="plan-save">Save $11</div>
+            <div class="plan-desc">One analysis + one redo. Tweak and regenerate if the first isn't perfect.</div>
+          </div>
+          <div class="plan-card" data-plan="3" onclick="selectPlan(this)">
+            <div class="plan-top">
+              <div class="plan-name">+ 2 Redos</div>
+              <div class="plan-badge">Best value</div>
+            </div>
+            <div class="plan-price">$34</div>
+            <div class="plan-save">Save $23</div>
+            <div class="plan-desc">One analysis + two redos. Our most popular — iterate until it's perfect.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API KEY SETTINGS -->
+      <div class="tool-step">
+        <div class="settings-toggle" id="settings-toggle" onclick="toggleSettings()">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg>
+          API settings (required)
+        </div>
+        <div class="settings-panel" id="settings-panel">
+          <div class="field" style="margin-bottom:.6rem"><label>Anthropic API key</label></div>
+          <div class="api-row">
+            <input type="password" id="api-key" placeholder="sk-ant-api03-..." />
+            <button class="api-save" onclick="saveApiKey()">Save</button>
+          </div>
+          <div class="api-note">Stored in your browser only. Used to run the AI analysis. Get a free key at <strong>console.anthropic.com</strong>. Never shared.</div>
+        </div>
+      </div>
+
+      <!-- GENERATE -->
+      <div class="gen-wrap">
+        <button class="gen-btn" id="gen-btn" onclick="handleGenerate()">
+          Analyze &amp; optimize my listing →
+        </button>
+        <div class="gen-sub" id="gen-sub">Sign in required · Results unlock after payment · API key required</div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results-wrap" id="results-wrap" style="display:none">
+        <div class="results-inner blurred" id="results-inner">
+
+          <div class="results-tabs">
+            <div class="rtab on" onclick="switchRTab(this,'audit')">Audit</div>
+            <div class="rtab" onclick="switchRTab(this,'title')">Title Fix</div>
+            <div class="rtab" onclick="switchRTab(this,'description')">Description</div>
+            <div class="rtab" onclick="switchRTab(this,'wins')">Quick Wins</div>
+          </div>
+
+          <!-- AUDIT -->
+          <div class="rpane on" id="rpane-audit">
+            <div class="score-banner" id="score-banner"></div>
+            <div class="out-label">Issues found — sorted by impact</div>
+            <ul class="issue-list" id="issue-list"></ul>
+            <div style="margin-top:1rem">
+              <div class="out-label">SEO keywords detected in your listing</div>
+              <div class="kw-chips" id="kw-chips"></div>
+            </div>
+          </div>
+
+          <!-- TITLE -->
+          <div class="rpane" id="rpane-title">
+            <div class="before-after">
+              <div class="ba-box">
+                <div class="ba-label before">Original title</div>
+                <div class="ba-text" id="orig-title">—</div>
+              </div>
+              <div class="ba-box">
+                <div class="ba-label after">Optimized title</div>
+                <div class="ba-text" id="new-title">—</div>
+              </div>
+            </div>
+            <div class="out-box" style="position:relative">
+              <button class="copy-btn" onclick="copyText(document.getElementById('new-title').textContent)">Copy</button>
+              <div class="out-label">Why this title ranks better</div>
+              <div id="title-rationale" style="font-size:13px;color:var(--muted);line-height:1.7"></div>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="rpane" id="rpane-description">
+            <div class="out-label">Rewritten description — copy & paste directly into your listing</div>
+            <div class="out-box" style="line-height:1.85;max-height:400px;overflow-y:auto;padding-right:2.5rem;position:relative">
+              <button class="copy-btn" onclick="copyText(document.getElementById('new-desc').innerText)">Copy all</button>
+              <div id="new-desc"></div>
+            </div>
+            <div style="margin-top:.75rem;font-size:11px;color:var(--muted);line-height:1.7;padding:.75rem;background:var(--warn-bg);border:.5px solid rgba(245,166,35,.2);border-radius:var(--r-sm)">
+              ⚠️ This description was rewritten using <strong>only information present in your original listing</strong>. No details have been added or invented.
+            </div>
+          </div>
+
+          <!-- QUICK WINS -->
+          <div class="rpane" id="rpane-wins">
+            <div class="out-label">Do these today — ranked by impact</div>
+            <ul class="win-list" id="win-list"></ul>
+          </div>
+
+          <!-- REDO BAR -->
+          <div class="redo-bar" id="redo-bar" style="display:none">
+            <div class="redo-info"><strong id="redo-remaining">0</strong> redo(s) remaining</div>
+            <button class="redo-btn" id="redo-btn" onclick="doRedo()">Regenerate →</button>
+          </div>
+
+        </div>
+
+        <!-- PAYWALL OVERLAY -->
+        <div class="paywall-overlay" id="paywall-overlay">
+          <div class="paywall-card">
+            <h3>Your report is ready 🎉</h3>
+            <p>Unlock your full analysis, rewritten title, description, and action plan — everything copy-paste ready.</p>
+            <div class="pay-amount" id="pay-price">$19<span> one time</span></div>
+            <button class="pay-btn" onclick="openPayment()" id="pay-btn">Unlock with PayPal →</button>
+            <div class="pay-note">Secure payment via PayPal. Click unlock, complete payment, then return here and confirm to reveal your results.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DISCLAIMER ─── -->
+<div class="disclaimer-section" id="disclaimer">
+  <div class="disclaimer-card">
+    <h4>Important Disclaimer</h4>
+    ListingAI optimizes your listing content for search visibility and click-through rate only. <strong>We do not guarantee sales, bookings, rentals, or any specific business outcome.</strong> Listing performance depends on many factors including market conditions, pricing strategy, property photography, platform algorithms, and decisions made by viewers — all of which are beyond our control.<br/><br/>
+    All rewrites and optimizations are based <strong>solely on information you provide</strong>. We do not add, invent, or hallucinate listing details. Our AI may suggest structural or wording improvements, but it will never introduce facts, features, or amenities that were not present in your original content.<br/><br/>
+    Results are provided as suggestions only. You retain full editorial control over your listing. ListingAI is not affiliated with Airbnb, Zillow, VRBO, or any other listing platform.
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div style="margin-bottom:.5rem">
+    <a href="index.html">Boop</a> · <a href="listing-optimizer.html">ListingBoost</a> · <a href="https://paypal.me/Milorgldo">paypal.me/Milorgldo</a>
+  </div>
+  &copy; 2026 ListingAI · <a href="#disclaimer">Disclaimer</a> · Results depend on many factors and are not guaranteed
+</footer>
+
+<script>
+// ─── CONFIG ───
+const PAYPAL_ME = 'https://paypal.me/Milorgldo';
+const PLAN_PRICES = { 1: 19, 2: 27, 3: 34 };
+const PLAN_LABELS = { 1: '$19 — Single analysis', 2: '$27 — Analysis + 1 redo', 3: '$34 — Analysis + 2 redos' };
+
+// ─── STATE ───
+let selectedPlan = 1;
+let currentResult = null;
+let jobState = null; // { plan, regenUsed, paid }
+
+// ─── AUTH ───
+function getUsers() { try { return JSON.parse(localStorage.getItem('lai_users') || '{}'); } catch(e) { return {}; } }
+function saveUsers(u) { localStorage.setItem('lai_users', JSON.stringify(u)); }
+function getSession() { return localStorage.getItem('lai_session'); }
+
+function doSignup() {
+  const email = document.getElementById('su-email').value.trim().toLowerCase();
+  const pass = document.getElementById('su-pass').value;
+  const pass2 = document.getElementById('su-pass2').value;
+  const err = document.getElementById('su-err');
+  err.style.display = 'none';
+  if (!email || !email.includes('@')) { showErr(err, 'Enter a valid email.'); return; }
+  if (pass.length < 6) { showErr(err, 'Password must be at least 6 characters.'); return; }
+  if (pass !== pass2) { showErr(err, "Passwords don't match."); return; }
+  const users = getUsers();
+  if (users[email]) { showErr(err, 'Account already exists. Log in instead.'); return; }
+  users[email] = { pw: btoa(pass), created: Date.now() };
+  saveUsers(users);
+  localStorage.setItem('lai_session', email);
+  closeAuth();
+  updateNav();
+}
+
+function doLogin() {
+  const email = document.getElementById('li-email').value.trim().toLowerCase();
+  const pass = document.getElementById('li-pass').value;
+  const err = document.getElementById('li-err');
+  err.style.display = 'none';
+  const users = getUsers();
+  if (!users[email] || users[email].pw !== btoa(pass)) { showErr(err, 'Invalid email or password.'); return; }
+  localStorage.setItem('lai_session', email);
+  closeAuth();
+  updateNav();
+}
+
+function logout() {
+  localStorage.removeItem('lai_session');
+  updateNav();
+  // reset results
+  document.getElementById('results-wrap').style.display = 'none';
+  jobState = null;
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+
+function openAuth(tab) { document.getElementById('auth-modal').classList.add('open'); switchAuthTab(tab); }
+function closeAuth() { document.getElementById('auth-modal').classList.remove('open'); }
+
+function switchAuthTab(tab) {
+  document.getElementById('tab-signup').classList.toggle('on', tab === 'signup');
+  document.getElementById('tab-login').classList.toggle('on', tab === 'login');
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.querySelector('.modal-title').textContent = tab === 'signup' ? 'Create account' : 'Welcome back';
+  document.querySelector('.modal-sub').textContent = tab === 'signup'
+    ? 'Free to join. Required to generate your report.'
+    : 'Log in to access your reports.';
+  document.getElementById('auth-switch-txt').innerHTML = tab === 'signup'
+    ? 'Already have an account? <span onclick="switchAuthTab(\'login\')">Log in</span>'
+    : 'Don\'t have an account? <span onclick="switchAuthTab(\'signup\')">Sign up free</span>';
+}
+
+function updateNav() {
+  const session = getSession();
+  const userEl = document.getElementById('nav-user');
+  const authEl = document.getElementById('nav-auth-btns');
+  if (session) {
+    userEl.style.display = 'flex';
+    authEl.style.display = 'none';
+    document.getElementById('nav-avatar').textContent = session[0].toUpperCase();
+    document.getElementById('nav-email-display').textContent = session;
+  } else {
+    userEl.style.display = 'none';
+    authEl.style.display = 'flex';
+  }
+}
+
+// ─── THEME ───
+function toggleTheme() {
+  const html = document.documentElement;
+  const dark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = dark ? '🌙' : '☀️';
+}
+
+// ─── SETTINGS ───
+function toggleSettings() {
+  const toggle = document.getElementById('settings-toggle');
+  const panel = document.getElementById('settings-panel');
+  toggle.classList.toggle('open');
+  panel.classList.toggle('open');
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key').value.trim();
+  if (key) { localStorage.setItem('lai_api_key', key); alert('API key saved.'); }
+}
+
+function getApiKey() {
+  return document.getElementById('api-key').value.trim()
+    || localStorage.getItem('lai_api_key')
+    || localStorage.getItem('lb_api_key')
+    || '';
+}
+
+// ─── PLAN PICKER ───
+function selectPlan(card) {
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedPlan = parseInt(card.dataset.plan);
+  document.getElementById('pay-price').innerHTML = `$${PLAN_PRICES[selectedPlan]}<span> one time</span>`;
+}
+
+// ─── URL FETCH ───
+async function fetchListing() {
+  const url = document.getElementById('listing-url').value.trim();
+  if (!url) { alert('Paste a listing URL first.'); return; }
+  const status = document.getElementById('fetch-status');
+  const btn = document.getElementById('fetch-btn');
+  btn.textContent = 'Fetching...';
+  btn.disabled = true;
+  status.textContent = 'Trying to retrieve listing...';
+  status.className = 'fetch-status';
+  try {
+    const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+    const resp = await fetch(proxy, { signal: AbortSignal.timeout(9000) });
+    if (!resp.ok) throw new Error('Blocked');
+    const html = await resp.text();
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    div.querySelectorAll('script,style,noscript,nav,footer,header,[aria-hidden]').forEach(el => el.remove());
+    const text = (div.innerText || div.textContent || '').replace(/\s{2,}/g, ' ').trim();
+    if (text.length < 80) throw new Error('Too little content');
+    document.getElementById('listing-content').value = text.substring(0, 5000);
+    status.textContent = '✓ Listing fetched successfully. Review the text below and add any extra notes.';
+    status.className = 'fetch-status fetch-ok';
+  } catch(e) {
+    status.textContent = "Couldn't auto-fetch this listing (most platforms block it). Paste your listing text manually in the box below.";
+    status.className = 'fetch-status fetch-fail';
+  }
+  btn.textContent = 'Try to fetch →';
+  btn.disabled = false;
+}
+
+// ─── GENERATE ───
+async function handleGenerate() {
+  if (!getSession()) { openAuth('signup'); return; }
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    toggleSettings();
+    document.getElementById('settings-panel').classList.add('open');
+    document.getElementById('settings-toggle').classList.add('open');
+    alert('Add your Anthropic API key in the settings above.');
+    return;
+  }
+  const content = document.getElementById('listing-content').value.trim();
+  const extra = document.getElementById('extra-notes').value.trim();
+  if (!content) { alert('Paste your listing content in Step 2 first.'); return; }
+
+  // Init job if fresh
+  if (!jobState) {
+    jobState = { plan: selectedPlan, regenUsed: 0, paid: false };
+  }
+
+  await runGeneration(apiKey, content, extra);
+}
+
+async function runGeneration(apiKey, content, extra) {
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Analyzing your listing...';
+
+  document.getElementById('results-wrap').style.display = 'block';
+  document.getElementById('results-inner').classList.add('blurred');
+  document.getElementById('paywall-overlay').classList.remove('show');
+  clearResults();
+
+  const prompt = `You are a listing SEO expert and copywriter. Your job is to analyze and rewrite a real property listing.
+
+CRITICAL RULES — follow these exactly:
+1. You must ONLY use information that is explicitly present in the listing text provided.
+2. Do NOT add, invent, assume, or hallucinate ANY details not in the listing.
+3. Do NOT mention amenities, features, locations, or selling points that are not stated in the listing.
+4. You may rewrite existing content using better structure, word order, SEO keywords, and language — but only from what is there.
+5. If a detail is unclear or missing from the listing, note the gap rather than fill it in.
+
+LISTING CONTENT:
+${content}
+
+ADDITIONAL OWNER NOTES:
+${extra || '(none provided)'}
+
+Analyze this listing and return ONLY valid JSON with this exact structure:
+{
+  "overall_score": <0-100 integer based on SEO quality and appeal of the provided content>,
+  "score_label": "<one sentence honest assessment>",
+  "issues": [
+    {"severity": "high|med|low", "text": "<specific issue found in the listing>"},
+    {"severity": "high|med|low", "text": "<specific issue>"},
+    {"severity": "high|med|low", "text": "<specific issue>"},
+    {"severity": "med|low", "text": "<specific issue>"},
+    {"severity": "low", "text": "<specific issue>"}
+  ],
+  "seo_keywords": ["<keyword found or implied in listing>", ...up to 8 keywords],
+  "original_title": "<the title or first line extracted from the listing content>",
+  "optimized_title": "<rewritten title using only words/concepts from the listing, max 65 chars>",
+  "title_rationale": "<explain what changed and why — no more than 2 sentences>",
+  "optimized_description": "<full rewritten description using ONLY facts from the listing, structured for maximum impact: hook first, amenities second, location last, ends with soft CTA. Minimum 200 words.>",
+  "quick_wins": [
+    "<specific actionable fix for this listing based on what is or isn't in the listing>",
+    "<actionable fix>",
+    "<actionable fix>",
+    "<actionable fix>",
+    "<actionable fix>"
+  ]
+}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.content.map(c => c.text || '').join('').replace(/```json|```/g, '').trim();
+    currentResult = JSON.parse(raw);
+    renderResults(currentResult);
+    showPaywall();
+  } catch(e) {
+    document.getElementById('results-wrap').style.display = 'none';
+    alert('Error: ' + (e.message || 'Something went wrong. Check your API key and try again.'));
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = 'Analyze &amp; optimize my listing →';
+}
+
+// ─── RENDER ───
+function renderResults(p) {
+  const score = p.overall_score;
+  const cls = score >= 70 ? 'high' : score >= 45 ? 'mid' : 'low';
+  document.getElementById('score-banner').innerHTML = `
+    <div class="score-circle ${cls}">${score}</div>
+    <div class="score-text">
+      <h3>Listing score: ${score}/100</h3>
+      <p>${p.score_label}</p>
+    </div>`;
+
+  document.getElementById('issue-list').innerHTML = p.issues.map(i => `
+    <li class="issue-item">
+      <span class="issue-dot dot-${i.severity}"></span>
+      <span>${i.text}</span>
+    </li>`).join('');
+
+  document.getElementById('kw-chips').innerHTML = (p.seo_keywords || []).map(k =>
+    `<span class="kw-chip">${k}</span>`).join('');
+
+  document.getElementById('orig-title').textContent = p.original_title || '(not found)';
+  document.getElementById('new-title').textContent = p.optimized_title || '';
+  document.getElementById('title-rationale').textContent = p.title_rationale || '';
+
+  document.getElementById('new-desc').innerHTML = (p.optimized_description || '').replace(/\n/g, '<br/>');
+
+  document.getElementById('win-list').innerHTML = (p.quick_wins || []).map((w, i) => `
+    <li class="win-item">
+      <span class="win-num">${i + 1}</span>
+      <span>${w}</span>
+    </li>`).join('');
+}
+
+function clearResults() {
+  ['score-banner','issue-list','kw-chips','orig-title','new-title','title-rationale','new-desc','win-list'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+}
+
+function showPaywall() {
+  document.getElementById('results-inner').classList.add('blurred');
+  document.getElementById('paywall-overlay').classList.add('show');
+  document.getElementById('pay-price').innerHTML = `$${PLAN_PRICES[jobState?.plan || selectedPlan]}<span> one time</span>`;
+}
+
+// ─── PAYMENT ───
+function openPayment() {
+  const plan = jobState?.plan || selectedPlan;
+  const amount = PLAN_PRICES[plan];
+  window.open(`${PAYPAL_ME}/${amount}USD`, '_blank');
+  setTimeout(() => {
+    if (confirm(`Did you complete your $${amount} payment? Click OK to unlock your results.`)) {
+      unlockResults();
+    }
+  }, 3500);
+}
+
+function unlockResults() {
+  if (jobState) jobState.paid = true;
+  document.getElementById('results-inner').classList.remove('blurred');
+  document.getElementById('paywall-overlay').classList.remove('show');
+  updateRedoBar();
+  document.getElementById('results-inner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── REDO ───
+function updateRedoBar() {
+  if (!jobState) return;
+  const totalRedos = jobState.plan - 1;
+  const remaining = totalRedos - jobState.regenUsed;
+  const bar = document.getElementById('redo-bar');
+  const btn = document.getElementById('redo-btn');
+  if (totalRedos === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  document.getElementById('redo-remaining').textContent = remaining;
+  btn.disabled = remaining <= 0;
+  btn.textContent = remaining > 0 ? 'Regenerate →' : 'No redos remaining';
+}
+
+function doRedo() {
+  if (!jobState || jobState.regenUsed >= jobState.plan - 1) return;
+  jobState.regenUsed++;
+  const apiKey = getApiKey();
+  const content = document.getElementById('listing-content').value.trim();
+  const extra = document.getElementById('extra-notes').value.trim();
+  // Bypass paywall for paid redos
+  runGeneration(apiKey, content, extra).then(() => {
+    document.getElementById('results-inner').classList.remove('blurred');
+    document.getElementById('paywall-overlay').classList.remove('show');
+    updateRedoBar();
+  });
+}
+
+// ─── TABS ───
+function switchRTab(el, name) {
+  document.querySelectorAll('.rtab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.rpane').forEach(p => p.classList.remove('on'));
+  document.getElementById('rpane-' + name).classList.add('on');
+}
+
+// ─── COPY ───
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target.closest('button') || event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+// ─── INIT ───
+(function init() {
+  updateNav();
+  const savedKey = localStorage.getItem('lai_api_key') || localStorage.getItem('lb_api_key');
+  if (savedKey) document.getElementById('api-key').value = savedKey;
+  // Auto open settings if no key
+  if (!savedKey) {
+    document.getElementById('settings-panel').classList.add('open');
+    document.getElementById('settings-toggle').classList.add('open');
+  }
+})();
+
+// Close modal on backdrop click
+document.getElementById('auth-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAuth();
+});
+</script>
+</body>
+</html>
