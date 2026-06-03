@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-slate-950 text-white antialiased;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-600;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass {
+    @apply bg-slate-900/80 backdrop-blur-md border border-slate-800;
+  }
+}
+
+/* Animated gradient for hot stocks */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.gradient-hot {
+  background: linear-gradient(270deg, #ff6b35, #ff4757, #ffd700, #ff6b35);
+  background-size: 300% 300%;
+  animation: gradient-shift 3s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Price flash animations */
+@keyframes flash-green {
+  0% { background-color: rgba(0, 212, 160, 0.3); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-red {
+  0% { background-color: rgba(255, 71, 87, 0.3); }
+  100% { background-color: transparent; }
+}
+
+.flash-up {
+  animation: flash-green 0.8s ease-out;
+}
+
+.flash-down {
+  animation: flash-red 0.8s ease-out;
+}
