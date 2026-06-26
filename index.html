@@ -1,391 +1,351 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Boop — Your viral content robot</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
-<style>
-:root[data-theme="light"] {
-  --bg: #f5f2ee;
-  --bg2: #edeae4;
-  --surface: #ffffff;
-  --border: rgba(0,0,0,0.08);
-  --border2: rgba(0,0,0,0.14);
-  --text: #1a1a1a;
-  --muted: #888;
-  --muted2: #bbb;
-  --accent: #ff6b35;
-  --accent2: #ff8f65;
-  --accent-light: #fff0eb;
-  --robot-body: #fff;
-  --robot-shadow: rgba(255,107,53,0.15);
-  --card-bg: #ffffff;
-}
-:root[data-theme="dark"] {
-  --bg: #0e0e0e;
-  --bg2: #161616;
-  --surface: #1a1a1a;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --text: #f0ede8;
-  --muted: #777;
-  --muted2: #444;
-  --accent: #ff6b35;
-  --accent2: #ff8f65;
-  --accent-light: rgba(255,107,53,0.12);
-  --robot-body: #222;
-  --robot-shadow: rgba(255,107,53,0.2);
-  --card-bg: #1a1a1a;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;transition:background .3s,color .3s;overflow-x:hidden}
-h1,h2,h3,.logo-text{font-family:'Syne',sans-serif}
-
-/* NAV */
-nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:0.5px solid var(--border);backdrop-filter:blur(8px)}
-.logo-text{font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
-.logo-robot{width:28px;height:28px;animation:bop 2s ease-in-out infinite}
-@keyframes bop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.nav-right{display:flex;align-items:center;gap:12px}
-.theme-toggle{width:36px;height:36px;border-radius:50%;border:0.5px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;transition:all .2s}
-.theme-toggle:hover{background:var(--surface);color:var(--text)}
-.nav-btn{padding:8px 18px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;font-weight:500;font-size:13px;transition:all .2s}
-.nav-btn:hover{background:var(--surface)}
-.nav-btn-accent{background:var(--accent);color:#fff;border-color:var(--accent)}
-.nav-btn-accent:hover{background:var(--accent2);border-color:var(--accent2)}
-
-/* HERO */
-.hero{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:5rem 2rem 4rem;max-width:1100px;margin:0 auto}
-.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:500;padding:5px 12px;border-radius:99px;margin-bottom:1.5rem;font-family:'Syne',sans-serif}
-.hero-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-.hero h1{font-size:52px;font-weight:800;line-height:1.1;letter-spacing:-1.5px;color:var(--text);margin-bottom:1.25rem}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero-sub{font-size:16px;color:var(--muted);line-height:1.7;margin-bottom:2rem;max-width:440px}
-.hero-cta{display:flex;gap:10px;flex-wrap:wrap}
-.cta-btn{padding:13px 28px;border-radius:99px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;border:none}
-.cta-primary{background:var(--accent);color:#fff}
-.cta-primary:hover{background:var(--accent2);transform:translateY(-1px)}
-.cta-secondary{background:transparent;color:var(--text);border:0.5px solid var(--border2)!important;border:none}
-.cta-secondary:hover{background:var(--surface)}
-.hero-stats{display:flex;gap:2rem;margin-top:2.5rem}
-.stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text)}
-.stat-label{font-size:12px;color:var(--muted);margin-top:2px}
-
-/* ROBOT SVG */
-.robot-wrap{display:flex;justify-content:center;align-items:center;position:relative}
-.robot-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:var(--robot-shadow);filter:blur(60px);z-index:0}
-.robot-svg{position:relative;z-index:1;animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
-.robot-eye{animation:blink 4s ease-in-out infinite}
-@keyframes blink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(0.1)}}
-.robot-antenna{animation:wiggle 2s ease-in-out infinite}
-@keyframes wiggle{0%,100%{transform:rotate(0deg)}25%{transform:rotate(8deg)}75%{transform:rotate(-8deg)}}
-.speech-bubble{position:absolute;top:-20px;right:-20px;background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;border-bottom-right-radius:4px;padding:10px 14px;font-size:12px;color:var(--text);white-space:nowrap;font-family:'Syne',sans-serif;font-weight:500;box-shadow:0 4px 20px var(--robot-shadow);animation:bubble 4s ease-in-out infinite}
-@keyframes bubble{0%,100%{opacity:1;transform:translateY(0)}45%{opacity:1;transform:translateY(-4px)}50%{opacity:0}55%{opacity:0}60%{opacity:1}}
-
-/* FEATURES */
-.features{padding:4rem 2rem;max-width:1100px;margin:0 auto}
-.section-label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif;margin-bottom:.75rem}
-.section-title{font-size:36px;font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:.75rem}
-.section-sub{font-size:15px;color:var(--muted);line-height:1.7;max-width:500px;margin-bottom:3rem}
-.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.feature-card{background:var(--card-bg);border:0.5px solid var(--border);border-radius:16px;padding:1.5rem;transition:border-color .2s,transform .2s}
-.feature-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.feature-icon{width:44px;height:44px;border-radius:12px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
-.feature-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:.5rem}
-.feature-desc{font-size:13px;color:var(--muted);line-height:1.7}
-
-/* PRICING */
-.pricing{padding:4rem 2rem;max-width:1100px;margin:0 auto;text-align:center}
-.pricing-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:2.5rem;text-align:left}
-.price-card{background:var(--card-bg);border:0.5px solid var(--border);border-radius:16px;padding:1.5rem;position:relative;transition:border .2s}
-.price-card.featured{border:2px solid var(--accent)}
-.price-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:.25rem}
-.price-amount{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);margin-bottom:.25rem}
-.price-amount span{font-size:13px;color:var(--muted);font-weight:400}
-.price-desc{font-size:12px;color:var(--muted);margin-bottom:1rem;line-height:1.6}
-.price-features{list-style:none;font-size:12px;color:var(--muted);line-height:2.2}
-.price-features li::before{content:"✓ ";color:var(--accent);font-weight:700}
-.price-btn{width:100%;margin-top:1.25rem;padding:10px;font-size:13px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .2s}
-.price-btn:hover,.price-card.featured .price-btn{background:var(--accent);color:#fff;border-color:var(--accent)}
-.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;padding:3px 12px;border-radius:99px;font-family:'Syne',sans-serif;font-weight:700;white-space:nowrap}
-
-/* CTA BANNER */
-.cta-banner{margin:2rem;border-radius:20px;background:var(--accent);padding:4rem 2rem;text-align:center;position:relative;overflow:hidden}
-.cta-banner h2{font-size:36px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:.75rem}
-.cta-banner p{font-size:15px;color:rgba(255,255,255,.8);margin-bottom:2rem}
-.cta-banner .cta-btn{background:#fff;color:var(--accent)}
-.cta-banner .cta-btn:hover{background:rgba(255,255,255,.9)}
-.banner-robot{position:absolute;right:5%;bottom:0;opacity:.15;font-size:120px}
-
-/* FOOTER */
-footer{padding:2rem;text-align:center;font-size:12px;color:var(--muted);border-top:0.5px solid var(--border)}
-
-/* SMALL BOOP */
-.boop-corner{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.boop-bubble{background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;border-bottom-right-radius:4px;padding:10px 14px;font-size:12px;color:var(--text);font-family:'Syne',sans-serif;font-weight:500;max-width:180px;text-align:right;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.boop-btn{width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
-.boop-btn:hover{transform:scale(1.1)}
-.boop-btn svg{animation:bop 2s ease-in-out infinite}
-
-@media(max-width:768px){
-  .hero{grid-template-columns:1fr;padding:3rem 1.5rem 2rem;gap:2rem;text-align:center}
-  .hero h1{font-size:36px}
-  .hero-sub{margin:0 auto 2rem}
-  .hero-cta{justify-content:center}
-  .hero-stats{justify-content:center}
-  .robot-wrap{order:-1}
-  .feature-grid{grid-template-columns:1fr}
-  .pricing-grid{grid-template-columns:1fr 1fr}
-  .speech-bubble{right:0}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ListingLaunch AI — Premium Real Estate Marketing in Minutes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<nav>
-  <div class="logo-text">
-    <svg class="logo-robot" viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="18" r="14" fill="#ff6b35"/>
-      <rect x="10" y="12" width="20" height="14" rx="5" fill="#fff3ee"/>
-      <rect x="13" y="15" width="6" height="6" rx="2" fill="#ff6b35"/>
-      <rect x="21" y="15" width="6" height="6" rx="2" fill="#ff6b35"/>
-      <rect x="15" y="17" width="2.5" height="2.5" rx="1" fill="white" opacity=".8"/>
-      <rect x="23" y="17" width="2.5" height="2.5" rx="1" fill="white" opacity=".8"/>
-      <path d="M14 23 Q20 27 26 23" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"/>
-      <rect x="18" y="3" width="4" height="8" rx="2" fill="#ff8f65"/>
-      <circle cx="20" cy="3" r="3" fill="#ffb380"/>
-      <circle cx="7" cy="16" r="5" fill="#ff8f65"/>
-      <circle cx="33" cy="16" r="5" fill="#ff8f65"/>
-    </svg>
-    Boop
-  </div>
-  <div class="nav-right">
-    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️</button>
-    <button class="nav-btn" onclick="goToApp()">Log in</button>
-    <button class="nav-btn nav-btn-accent" onclick="goToApp()">Try for free</button>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div>
-    <div class="hero-tag"><div class="hero-tag-dot"></div>AI content robot — ready to boop</div>
-    <h1>Your personal<br/><em>viral content</em><br/>robot is here</h1>
-    <p class="hero-sub">Boop generates brainrot stories, captions, hooks, and background video packs in seconds. Just tell Boop what you want — it handles everything.</p>
-    <div class="hero-cta">
-      <button class="cta-btn cta-primary" onclick="goToApp()">Start for free — it's Boop time</button>
-      <button class="cta-btn cta-secondary" onclick="document.getElementById('features').scrollIntoView()">See what Boop does</button>
-    </div>
-    <div class="hero-stats">
-      <div><div class="stat-num">3</div><div class="stat-label">Free generations</div></div>
-      <div><div class="stat-num">99¢</div><div class="stat-label">Per extra use</div></div>
-      <div><div class="stat-num">∞</div><div class="stat-label">Viral potential</div></div>
-    </div>
-  </div>
-  <div class="robot-wrap">
-    <div class="robot-glow"></div>
-    <div class="speech-bubble" id="speech">let me cook</div>
-    <svg class="robot-svg" width="240" height="270" viewBox="0 0 240 270" fill="none">
-      <ellipse cx="120" cy="262" rx="66" ry="10" fill="rgba(255,107,53,0.15)"/>
-      <ellipse cx="120" cy="178" rx="81" ry="75" fill="#ff6b35"/>
-      <circle cx="120" cy="102" r="72" fill="#ff6b35"/>
-      <rect x="69" y="68" width="102" height="70" rx="20" fill="#fff3ee"/>
-      <rect x="83" y="82" width="28" height="28" rx="8" fill="#ff6b35" class="robot-eye"/>
-      <rect x="129" y="82" width="28" height="28" rx="8" fill="#ff6b35" class="robot-eye"/>
-      <rect x="91" y="88" width="10" height="10" rx="3" fill="white" opacity=".8"/>
-      <rect x="137" y="88" width="10" height="10" rx="3" fill="white" opacity=".8"/>
-      <path d="M96 122 Q120 134 144 122" stroke="#ff6b35" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".6"/>
-      <circle cx="74" cy="118" r="13" fill="#ffaa80" opacity=".3"/>
-      <circle cx="166" cy="118" r="13" fill="#ffaa80" opacity=".3"/>
-      <rect x="115" y="22" width="10" height="28" rx="5" fill="#ff8f65"/>
-      <circle cx="120" cy="20" r="12" fill="#ffb380"/>
-      <circle cx="50" cy="94" r="20" fill="#ff8f65"/>
-      <circle cx="190" cy="94" r="20" fill="#ff8f65"/>
-      <ellipse cx="38" cy="178" rx="20" ry="30" fill="#ff8f65" transform="rotate(-12 38 178)"/>
-      <ellipse cx="202" cy="178" rx="20" ry="30" fill="#ff8f65" transform="rotate(12 202 178)"/>
-      <ellipse cx="90" cy="246" rx="24" ry="18" fill="#ff8f65"/>
-      <ellipse cx="150" cy="246" rx="24" ry="18" fill="#ff8f65"/>
-    </svg>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="features" id="features">
-  <div class="section-label">What Boop does</div>
-  <h2 class="section-title">Your entire content<br/>team in one robot</h2>
-  <p class="section-sub">Boop does the thinking, writing, and sourcing. You do the posting.</p>
-  <div class="feature-grid">
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M11 3C7.5 3 5 5.5 5 8.5c0 2 1 3.8 2.5 4.8L7 19h8l-.5-5.7C16 12.3 17 10.5 17 8.5 17 5.5 14.5 3 11 3z"/></svg>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">ListingLaunch<span class="logo-accent">AI</span></a>
+      <div class="nav-links">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#samples">Sample Work</a>
+        <a href="#reseller">Resellers</a>
+        <a href="/app.html" class="btn btn-primary btn-sm">Start a Campaign</a>
       </div>
-      <div class="feature-title">Brainrot scripts</div>
-      <div class="feature-desc">AITA stories, Karen drama, plot twists — Boop writes viral scripts in your voice with timed captions ready to go.</div>
+      <button class="mobile-toggle" id="mobileToggle">☰</button>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="2" y="2" width="18" height="14" rx="3"/><path d="M7 20h8M11 16v4"/></svg>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="badge">🚀 Turn One Listing Into a Full Campaign</div>
+          <h1>Premium Real Estate Marketing.<br><span class="gradient-text">In Under 10 Minutes.</span></h1>
+          <p class="hero-sub">One property listing. One submission. A complete, conversion-focused marketing campaign — MLS copy, social content, ads, email/SMS follow-ups, video scripts, and seller reports. No templates. No agencies. No waiting.</p>
+          <div class="hero-cta">
+            <a href="/app.html" class="btn btn-primary btn-lg">Launch Your First Campaign →</a>
+            <a href="#how-it-works" class="btn btn-outline btn-lg">See How It Works</a>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric"><span class="metric-value">3</span><span class="metric-label">Campaign Tiers</span></div>
+            <div class="metric"><span class="metric-value">8</span><span class="metric-label">AI Specialists</span></div>
+            <div class="metric"><span class="metric-value">10min</span><span class="metric-label">Avg. Delivery</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="visual-card">
+            <div class="visual-header">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+              <span class="visual-title">campaign_1247_sunset_ridge.md</span>
+            </div>
+            <div class="visual-body">
+              <div class="v-line"><span class="v-key">Positioning:</span> Modern Austin Luxury</div>
+              <div class="v-line"><span class="v-key">Buyer Avatar:</span> Ryan & Lauren (Tech Relo)</div>
+              <div class="v-line"><span class="v-key">10 Viral Hooks</span> ✓</div>
+              <div class="v-line"><span class="v-key">5 Instagram Captions</span> ✓</div>
+              <div class="v-line"><span class="v-key">3 Reels Scripts</span> ✓</div>
+              <div class="v-line"><span class="v-key">MLS Copy (3 versions)</span> ✓</div>
+              <div class="v-line"><span class="v-key">5 Ad Angles + Targeting</span> ✓</div>
+              <div class="v-line"><span class="v-key">4-Email Follow-Up Seq.</span> ✓</div>
+              <div class="v-line"><span class="v-key">Seller Report Template</span> ✓</div>
+              <div class="v-line visual-cta">→ Ready to deliver to client</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="feature-title">Royalty-free video</div>
-      <div class="feature-desc">Boop pulls live Minecraft parkour, subway surfers, cooking clips and more — all royalty-free, ready to layer under your script.</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M2 12l5-5 4 4 9-9"/></svg>
+  </section>
+
+  <!-- Logos / Trust Bar -->
+  <section class="trust-bar">
+    <div class="container">
+      <p class="trust-label">Trusted by real estate professionals nationwide</p>
+      <div class="trust-logos">
+        <span class="trust-logo">KELLER WILLIAMS</span>
+        <span class="trust-logo">COMPASS</span>
+        <span class="trust-logo">EXP REALTY</span>
+        <span class="trust-logo">SOTHEBY'S</span>
+        <span class="trust-logo">REDFIN</span>
+        <span class="trust-logo">HOMELIGHT</span>
       </div>
-      <div class="feature-title">SEO + hooks</div>
-      <div class="feature-desc">Boop knows what stops the scroll. Every script comes with a hook, caption, hashtags, and best posting time for your platform.</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M18 3H4a1 1 0 00-1 1v8a1 1 0 001 1h3l4 4 4-4h3a1 1 0 001-1V4a1 1 0 00-1-1z"/></svg>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">From Listing to Launch. <span class="gradient-text">Done in Minutes.</span></h2>
+      <p class="section-sub">No software to learn. No forms to fill. Just submit your property and get a complete campaign.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <h3>Submit Your Property</h3>
+          <p>Tell us the address, price, features, and target buyer. That's all we need. Our intake form takes 2 minutes.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <h3>AI Team Goes to Work</h3>
+          <p>Your campaign is assigned to 8 AI specialists simultaneously — strategist, copywriter, social, ads, email, lead capture, and reporting.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <h3>Receive Your Campaign Pack</h3>
+          <p>A complete, polished campaign delivered as a premium PDF and editable files. Ready to publish, post, email, and print.</p>
+        </div>
       </div>
-      <div class="feature-title">Comment replies</div>
-      <div class="feature-desc">Paste your comments and Boop drafts human-sounding replies that build community and push follows.</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="12" y="3" width="7" height="7" rx="1"/><rect x="3" y="12" width="7" height="7" rx="1"/><rect x="12" y="12" width="7" height="7" rx="1"/></svg>
+  </section>
+
+  <!-- Deliverables -->
+  <section class="section section-dark" id="deliverables">
+    <div class="container">
+      <div class="section-label">What You Get</div>
+      <h2 class="section-title">Every Campaign Includes</h2>
+      <div class="deliverables-grid">
+        <div class="deliverable">
+          <div class="del-icon">📊</div>
+          <h3>Campaign Strategy</h3>
+          <p>Selling angle, positioning, buyer avatar, channel plan</p>
+        </div>
+        <div class="deliverable">
+          <div class="del-icon">✍️</div>
+          <h3>MLS & Listing Copy</h3>
+          <p>Short, medium, luxury, Zillow, Redfin, website, flyer</p>
+        </div>
+        <div class="deliverable">
+          <div class="del-icon">📱</div>
+          <h3>Social Media Pack</h3>
+          <p>10 hooks, 5 captions, 3 carousels, hashtags</p>
+        </div>
+        <div class="deliverable">
+          <div class="del-icon">🎬</div>
+          <h3>Video / Reels Pack</h3>
+          <p>3 Reels scripts, 2 Shorts, shot list, audio suggestions</p>
+        </div>
+        <div class="deliverable">
+          <div class="del-icon">📧</div>
+          <h3>Email & SMS Sequences</h3>
+          <p>Buyer follow-ups, open house reminders, price-drop alerts</p>
+        </div>
+        <div class="deliverable">
+          <div class="del-icon">🎯</div>
+          <h3>Ad Copy Pack</h3>
+          <p>5 angles with headlines, hooks, targeting, visuals</p>
+        </div>
+        <div class="deliverable">
+          <div class="del-icon">🔗</div>
+          <h3>Lead Capture System</h3>
+          <p>DM prompts, landing page copy, lead magnets, SMS opt-in</p>
+        </div>
+        <div class="deliverable">
+          <div class="del-icon">📈</div>
+          <h3>Seller Report Template</h3>
+          <p>Weekly dashboard, showing feedback, market context, next steps</p>
+        </div>
       </div>
-      <div class="feature-title">All platforms</div>
-      <div class="feature-desc">TikTok, Instagram Reels, YouTube Shorts, Pinterest — Boop optimizes every piece of content for each platform's algorithm.</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M11 7v4l3 3"/></svg>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Choose Your Campaign Tier</h2>
+      <p class="section-sub">From a quick listing boost to a full luxury launch. White-label pricing available for resellers.</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-tier">Starter</div>
+          <div class="pricing-price">$497</div>
+          <div class="pricing-desc">per listing campaign</div>
+          <ul class="pricing-features">
+            <li>✓ Campaign Strategy & Buyer Avatar</li>
+            <li>✓ MLS Copy (3 versions)</li>
+            <li>✓ Zillow / Realtor.com / Redfin Copy</li>
+            <li>✓ Agent Website Copy</li>
+            <li>✓ 5 Instagram Captions + Hashtags</li>
+            <li>✓ 10 Viral Hooks</li>
+            <li>✓ 5 DM Lead Capture Prompts</li>
+          </ul>
+          <a href="/app.html" class="btn btn-outline btn-full">Get Started</a>
+        </div>
+        <div class="pricing-card pricing-featured">
+          <div class="pricing-badge">Most Popular</div>
+          <div class="pricing-tier">Pro Launch</div>
+          <div class="pricing-price">$997</div>
+          <div class="pricing-desc">per listing campaign</div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Starter</li>
+            <li>✓ 3 TikTok/Reels Scripts + 2 Shorts</li>
+            <li>✓ 60-Second Video Shot List</li>
+            <li>✓ 4-Email Buyer Follow-Up Sequence</li>
+            <li>✓ Open House Reminder Pack</li>
+            <li>✓ Price-Drop Announcement Pack</li>
+            <li>✓ 3 Carousel Post Scripts</li>
+            <li>✓ Landing Page Copy</li>
+            <li>✓ 3 Lead Magnet Ideas</li>
+            <li>✓ Seller Report Template</li>
+          </ul>
+          <a href="/app.html" class="btn btn-primary btn-full">Get Started</a>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-tier">Luxury</div>
+          <div class="pricing-price">$1,997</div>
+          <div class="pricing-desc">per listing campaign</div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Pro</li>
+            <li>✓ Full Ad Copy Pack (5 Angles)</li>
+            <li>✓ Facebook/Instagram Audience Targeting</li>
+            <li>✓ Lead Follow-Up Scripts + SMS Opt-In</li>
+            <li>✓ Weekly Seller Report Template</li>
+            <li>✓ FAQ Response Templates</li>
+            <li>✓ Open House Flyer Copy</li>
+            <li>✓ Custom Brand Voice Integration</li>
+            <li>✓ Priority 24-Hour Delivery</li>
+          </ul>
+          <a href="/app.html" class="btn btn-outline btn-full">Get Started</a>
+        </div>
       </div>
-      <div class="feature-title">Instant output</div>
-      <div class="feature-desc">Full video package in under 10 seconds. Hook, script, captions, hashtags, video source — copy and go.</div>
+      <div class="retainers">
+        <div class="retainer-card">
+          <h3>📅 Monthly Agent Retainer</h3>
+          <p class="retainer-price">$299–$499<span>/mo</span></p>
+          <p>Up to 4 listings/month + ongoing brand voice</p>
+        </div>
+        <div class="retainer-card">
+          <h3>🏢 Real Estate Team Retainer</h3>
+          <p class="retainer-price">$999–$2,500<span>/mo</span></p>
+          <p>Up to 15 listings/month + team brand guide + priority delivery</p>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="section-label">Pricing</div>
-  <h2 class="section-title">Pick your Boop plan</h2>
-  <p class="section-sub" style="margin:0 auto 0">No hidden fees. Cancel anytime. Pay with PayPal.</p>
-  <div class="pricing-grid">
-    <div class="price-card">
-      <div class="price-name">Free</div>
-      <div class="price-amount">$0<span>/forever</span></div>
-      <div class="price-desc">Try Boop risk-free</div>
-      <ul class="price-features">
-        <li>3 free generations</li>
-        <li>All story types</li>
-        <li>Pexels video search</li>
-        <li>Ads shown</li>
-      </ul>
-      <button class="price-btn" onclick="goToApp()">Start free</button>
+  <!-- Sample / Demo Section -->
+  <section class="section section-dark" id="samples">
+    <div class="container">
+      <div class="section-label">Sample Campaign</div>
+      <h2 class="section-title">See What We Produced for 1247 Sunset Ridge</h2>
+      <p class="section-sub">A luxury new-construction home in Austin, TX. One submission. Everything below was delivered in minutes.</p>
+      <div class="sample-grid">
+        <div class="sample-card">
+          <div class="sample-icon">📊</div>
+          <h3>Campaign Strategy</h3>
+          <p>Positioning: "Modern Austin Luxury" — two detailed buyer avatars (Ryan & Lauren), multi-channel plan</p>
+        </div>
+        <div class="sample-card">
+          <div class="sample-icon">✍️</div>
+          <h3>MLS Copy Suite</h3>
+          <p>Short (136w), Medium (276w), Luxury (487w) + Zillow, Redfin, agent website, and flyer copy</p>
+        </div>
+        <div class="sample-card">
+          <div class="sample-icon">📱</div>
+          <h3>Social Media Pack</h3>
+          <p>10 viral hooks, 5 Instagram captions, 3 carousel scripts, 3 Reels scripts, 2 Shorts, 22-shot video plan</p>
+        </div>
+        <div class="sample-card">
+          <div class="sample-icon">📧</div>
+          <h3>Email & SMS Follow-Up</h3>
+          <p>4-email buyer sequence with rate buydown math, open house reminders, showing follow-ups, FAQ templates</p>
+        </div>
+        <div class="sample-card">
+          <div class="sample-icon">🎯</div>
+          <h3>Ad Angles</h3>
+          <p>5 angles (Luxury, Urgency, Lifestyle, Local, Investment) each with headlines, hooks, audience targeting</p>
+        </div>
+        <div class="sample-card">
+          <div class="sample-icon">🔗</div>
+          <h3>Lead Capture System</h3>
+          <p>5 DM prompts with auto-response sequences, full landing page copy, SMS opt-in (11 keywords), 3 lead magnets</p>
+        </div>
+      </div>
     </div>
-    <div class="price-card">
-      <div class="price-name">Pay per use</div>
-      <div class="price-amount">99¢<span>/generation</span></div>
-      <div class="price-desc">Or 5 for $3.99</div>
-      <ul class="price-features">
-        <li>Buy as you go</li>
-        <li>No subscription</li>
-        <li>All story types</li>
-        <li>Ads shown</li>
-      </ul>
-      <button class="price-btn" onclick="goToApp()">Buy credits</button>
+  </section>
+
+  <!-- Reseller Section -->
+  <section class="section" id="reseller">
+    <div class="container">
+      <div class="section-label">For Resellers</div>
+      <h2 class="section-title">Sell ListingLaunch Campaigns to Your Clients</h2>
+      <p class="section-sub">Photographers, VAs, media companies, and marketing agencies — add a new revenue stream with zero overhead.</p>
+      <div class="reseller-benefits">
+        <div class="reseller-benefit">
+          <h3>💰 100% Margins</h3>
+          <p>Set your own prices. Bill clients $497–$2,997 per campaign, keep every dollar.</p>
+        </div>
+        <div class="reseller-benefit">
+          <h3>🏷️ White-Label Ready</h3>
+          <p>Deliver under your own brand. We provide white-label outputs and custom branding options.</p>
+        </div>
+        <div class="reseller-benefit">
+          <h3>📈 Recurring Revenue</h3>
+          <p>Convert clients to monthly retainers ($299–$2,500/mo). Predictable income, minimal effort.</p>
+        </div>
+        <div class="reseller-benefit">
+          <h3>⚡ No Learning Curve</h3>
+          <p>Submit listing details → receive campaign pack → deliver to your client in minutes.</p>
+        </div>
+      </div>
     </div>
-    <div class="price-card">
-      <div class="price-name">Starter</div>
-      <div class="price-amount">$7<span>/month</span></div>
-      <div class="price-desc">For consistent creators</div>
-      <ul class="price-features">
-        <li>50 generations/month</li>
-        <li>No ads</li>
-        <li>All story types</li>
-        <li>Pexels video search</li>
-      </ul>
-      <button class="price-btn" onclick="goToApp()">Get Starter</button>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-cta">
+    <div class="container">
+      <h2>Ready to Launch Your First Campaign?</h2>
+      <p>Submit a property and get a complete marketing campaign back. No commitment, no risk.</p>
+      <a href="/app.html" class="btn btn-primary btn-lg">Start Your Campaign →</a>
     </div>
-    <div class="price-card featured">
-      <div class="popular-badge">Most popular</div>
-      <div class="price-name">Pro</div>
-      <div class="price-amount">$15<span>/month</span></div>
-      <div class="price-desc">For serious creators</div>
-      <ul class="price-features">
-        <li>Unlimited generations</li>
-        <li>No ads ever</li>
-        <li>YouTube CC videos</li>
-        <li>Priority features</li>
-      </ul>
-      <button class="price-btn" onclick="goToApp()">Go Pro</button>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo">ListingLaunch<span class="logo-accent">AI</span></a>
+          <p>Premium real estate marketing, delivered in minutes by a dedicated AI agency team.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Product</h4>
+          <a href="#pricing">Pricing</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#deliverables">Deliverables</a>
+          <a href="#samples">Sample Campaign</a>
+        </div>
+        <div class="footer-links">
+          <h4>For Resellers</h4>
+          <a href="#reseller">Reseller Program</a>
+          <a href="/pricing-guide.html">Reseller Pricing Guide</a>
+          <a href="#">White-Label Options</a>
+        </div>
+        <div class="footer-links">
+          <h4>Legal</h4>
+          <a href="#">Terms of Service</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Compliance</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 ListingLaunch AI. All rights reserved. Not a licensed real estate broker. Marketing content only — verify all compliance independently.</p>
+      </div>
     </div>
-  </div>
-</section>
+  </footer>
 
-<!-- CTA -->
-<div class="cta-banner">
-  <h2>Ready to let Boop cook?</h2>
-  <p>3 free generations. No credit card. No excuses.</p>
-  <button class="cta-btn" onclick="goToApp()">Start booping now</button>
-  <div class="banner-robot">🤖</div>
-</div>
-
-<footer>
-  Built with love by Boop · <a href="#" style="color:var(--muted)">paypal.me/Milorgldo</a> · &copy; 2026 Boop
-</footer>
-
-<!-- Persistent small Boop -->
-<div class="boop-corner">
-  <div class="boop-bubble" id="corner-bubble">psst... wanna go viral? 👀</div>
-  <button class="boop-btn" onclick="boopClick()">
-    <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="22" r="14" fill="white"/>
-      <rect x="11" y="16" width="18" height="12" rx="4" fill="#fff3ee"/>
-      <rect x="13" y="18" width="6" height="6" rx="2" fill="#ff6b35"/>
-      <rect x="21" y="18" width="6" height="6" rx="2" fill="#ff6b35"/>
-      <rect x="15" y="20" width="2" height="2" rx="1" fill="white" opacity=".8"/>
-      <rect x="23" y="20" width="2" height="2" rx="1" fill="white" opacity=".8"/>
-      <path d="M14 25 Q20 29 26 25" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"/>
-      <rect x="18" y="6" width="4" height="9" rx="2" fill="white" opacity=".8"/>
-      <circle cx="20" cy="5" r="3" fill="white" opacity=".6"/>
-    </svg>
-  </button>
-</div>
-
-<script>
-const phrases = [
-  "let me cook 🤖","i got you bestie","viral incoming...","beep boop boop","your content slaps","trust the process","i live for this","going viral rn","boop! 🤖","say less, i'm on it"
-];
-let pi = 0;
-setInterval(()=>{
-  pi = (pi+1)%phrases.length;
-  document.getElementById('speech').textContent = phrases[pi];
-}, 3500);
-
-const cornerPhrases = [
-  "psst... wanna go viral? 👀","boop me and find out 🤖","your next post could be huge","i'm literally built for this","click me. do it. 👆","3 free tries. no excuses."
-];
-let ci = 0;
-setInterval(()=>{
-  ci = (ci+1)%cornerPhrases.length;
-  document.getElementById('corner-bubble').textContent = cornerPhrases[ci];
-}, 4000);
-
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme')==='dark';
-  html.setAttribute('data-theme', isDark?'light':'dark');
-  document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
-}
-
-function goToApp() {
-  window.location.href = 'boop-app.html';
-}
-
-function boopClick() {
-  goToApp();
-}
-</script>
+  <script src="app.js"></script>
 </body>
 </html>
