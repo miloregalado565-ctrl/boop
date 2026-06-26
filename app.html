@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start a Campaign — ListingLaunch AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo">ListingLaunch<span class="logo-accent">AI</span></a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/#samples">Sample Work</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-page">
+    <div class="container">
+      <div class="app-header">
+        <div class="badge">⚡ Under 10 Minutes</div>
+        <h1>Launch Your Listing Campaign</h1>
+        <p>Fill out the property details below and our AI team will build your complete marketing campaign.</p>
+      </div>
+
+      <div class="app-form" id="formContent">
+        <form id="campaignForm">
+          <!-- Tier Selection -->
+          <label style="font-size:14px;font-weight:600;margin-bottom:12px;display:block;">Select Campaign Tier</label>
+          <div class="form-tier">
+            <div class="tier-option selected" data-tier="starter">
+              <div class="tier-name">Starter</div>
+              <div class="tier-price">$497</div>
+              <div class="tier-desc">Listing copy + social</div>
+            </div>
+            <div class="tier-option" data-tier="pro">
+              <div class="tier-name">Pro Launch</div>
+              <div class="tier-price">$997</div>
+              <div class="tier-desc">Full campaign + video + email</div>
+            </div>
+            <div class="tier-option" data-tier="luxury">
+              <div class="tier-name">Luxury</div>
+              <div class="tier-price">$1,997</div>
+              <div class="tier-desc">Premium + ads + priority</div>
+            </div>
+          </div>
+          <input type="hidden" name="campaignTier" id="campaignTier" value="starter" />
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="propertyAddress">Property Address *</label>
+              <input type="text" id="propertyAddress" name="propertyAddress" placeholder="123 Main St, City, State ZIP" required />
+            </div>
+            <div class="form-group">
+              <label for="listingPrice">Listing Price *</label>
+              <input type="text" id="listingPrice" name="listingPrice" placeholder="$895,000" required />
+            </div>
+            <div class="form-group">
+              <label for="propertyType">Property Type</label>
+              <select id="propertyType" name="propertyType">
+                <option value="single-family">Single Family Home</option>
+                <option value="condo">Condo / Apartment</option>
+                <option value="townhouse">Townhouse</option>
+                <option value="multi-family">Multi-Family</option>
+                <option value="land">Land / Lot</option>
+                <option value="commercial">Commercial</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="bedrooms">Bedrooms</label>
+              <input type="number" id="bedrooms" name="bedrooms" placeholder="4" />
+            </div>
+            <div class="form-group">
+              <label for="bathrooms">Bathrooms</label>
+              <input type="text" id="bathrooms" name="bathrooms" placeholder="3.5" />
+            </div>
+            <div class="form-group">
+              <label for="sqft">Square Feet</label>
+              <input type="text" id="sqft" name="sqft" placeholder="3,200" />
+            </div>
+            <div class="form-group">
+              <label for="yearBuilt">Year Built</label>
+              <input type="text" id="yearBuilt" name="yearBuilt" placeholder="2022" />
+            </div>
+            <div class="form-group full">
+              <label for="keyFeatures">Key Features (one per line) *</label>
+              <textarea id="keyFeatures" name="keyFeatures" placeholder="Open concept with floor-to-ceiling windows&#10;Chef's kitchen with waterfall island&#10;Saltwater pool and outdoor kitchen&#10;Smart home system&#10;3-car garage with EV charging&#10;No HOA" required></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="targetBuyer">Target Buyer *</label>
+              <textarea id="targetBuyer" name="targetBuyer" placeholder="Affluent professionals 35-50, relocating tech executives or remote workers, families looking for top schools. Describe who you want to attract." required></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="brandVoice">Agent Brand Voice</label>
+              <textarea id="brandVoice" name="brandVoice" placeholder="High-end but not stuffy. Confident, direct, lifestyle-focused. E.g., 'Where Austin luxury meets nature.'"></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="marketingGoal">Marketing Goal *</label>
+              <textarea id="marketingGoal" name="marketingGoal" placeholder="Generate buyer leads and schedule private showings. Target sell within 30 days." required></textarea>
+            </div>
+            <div class="form-group full">
+              <label for="specialNotes">Special Notes</label>
+              <textarea id="specialNotes" name="specialNotes" placeholder="Builder incentives, price adjustments, HOA info, unique selling points, upcoming open houses, etc."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">🚀 Launch Campaign</button>
+            <p style="font-size:12px;color:#888;margin-top:12px;">Your campaign will be delivered to our team. We'll process and return the full pack within minutes.</p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success State -->
+      <div class="form-success" id="formSuccess">
+        <div style="font-size:64px;margin-bottom:16px;">✅</div>
+        <h2>Campaign Submitted!</h2>
+        <p>Your property has been received by our AI team. Your complete campaign pack will be ready shortly.</p>
+        <p style="margin-top:8px;color:#6C63FF;font-weight:600;">Check the shared campaign directory for your deliverables.</p>
+        <a href="/" class="btn btn-primary btn-lg" style="margin-top:24px;">Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>© 2026 ListingLaunch AI. All rights reserved. Marketing content only — verify compliance independently.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
