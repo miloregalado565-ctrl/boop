@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Flashly — Study App</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0f19; --surface:#121829; --surface2:#1a2236; --border:rgba(255,255,255,.08);
+  --border2:rgba(255,255,255,.16); --text:#eef1f8; --muted:#8890a4;
+  --accent:#34d399; --accent-dark:#059669; --amber:#fbbf24; --danger:#f87171;
+  --radius:14px; --radius-sm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+h1,h2,h3,.logo,.brand-font{font-family:'Sora',sans-serif}
+a{color:inherit}
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:1.25rem 1rem;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;flex-shrink:0}
+.logo{font-size:19px;font-weight:800;color:var(--accent);letter-spacing:-.5px;margin-bottom:.25rem}
+.logo span{color:var(--muted);font-size:11px;font-weight:500;display:block;font-family:'Inter',sans-serif;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.nav{margin-top:1.25rem;display:flex;flex-direction:column;gap:2px}
+.nav-item{padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--surface2);color:var(--accent);font-weight:600}
+.side-stats{margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+.side-stats b{color:var(--text)}
+.pro-badge{margin-top:10px;padding:10px;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(251,191,36,.1));border:1px solid var(--border2);border-radius:var(--radius-sm);font-size:11px}
+.pro-badge b{color:var(--amber)}
+.upgrade-link{display:block;margin-top:8px;text-align:center;font-size:12px;font-weight:700;color:var(--bg);background:var(--accent);padding:7px;border-radius:8px;text-decoration:none}
+.main{flex:1;padding:2rem;max-width:920px;width:100%;margin:0 auto}
+.view-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap}
+.view-header h1{font-size:22px}
+.view-header p{color:var(--muted);font-size:13px;margin-top:4px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:13px;font-weight:700;margin-bottom:.9rem;letter-spacing:.02em}
+.btn{padding:9px 16px;font-size:13px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;transition:all .15s}
+.btn:hover{background:var(--surface2)}
+.btn-accent{background:var(--accent);color:#06281c;border-color:var(--accent);font-weight:700}
+.btn-accent:hover{background:var(--accent-dark);color:#fff}
+.btn-danger{border-color:rgba(248,113,113,.4);color:var(--danger)}
+.btn-danger:hover{background:rgba(248,113,113,.1)}
+.btn-sm{padding:6px 11px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=text],input[type=date],input[type=number],textarea,select{
+  padding:9px 12px;font-size:13px;border-radius:var(--radius-sm);border:1px solid var(--border2);
+  background:var(--surface2);color:var(--text);font-family:'Inter',sans-serif;width:100%;outline:none;transition:border .15s;
+}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;font-weight:600}
+.field{margin-bottom:.85rem}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > *{flex:1;min-width:140px}
+.muted{color:var(--muted)}
+.empty{color:var(--muted);font-size:13px;padding:1.5rem 0;text-align:center}
+.deck-list{display:flex;flex-direction:column;gap:8px}
+.deck-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);gap:10px;flex-wrap:wrap}
+.deck-row .name{font-weight:700;font-size:14px}
+.deck-row .meta{font-size:12px;color:var(--muted);margin-top:2px}
+.pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:99px;background:rgba(52,211,153,.15);color:var(--accent);font-weight:700;margin-left:6px}
+.pill.due{background:rgba(251,191,36,.15);color:var(--amber)}
+.limit-banner{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);color:var(--amber);padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;margin-bottom:1rem}
+/* Study */
+.study-stage{max-width:520px;margin:0 auto}
+.progress-bar{height:5px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:1.25rem}
+.progress-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .2s}
+.flashcard{background:var(--surface);border:1px solid var(--border2);border-radius:18px;min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;cursor:pointer;font-size:19px;font-weight:600;line-height:1.5;user-select:none}
+.flashcard .side-label{position:absolute;top:14px;left:18px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.flashcard-wrap{position:relative}
+.hint{text-align:center;color:var(--muted);font-size:12px;margin-top:10px}
+.rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:1.25rem}
+.rate-btn{padding:12px 6px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);cursor:pointer;text-align:center;transition:all .15s}
+.rate-btn b{display:block;font-size:13px}
+.rate-btn small{color:var(--muted);font-size:10px}
+.rate-again{border-color:rgba(248,113,113,.5)} .rate-again:hover{background:rgba(248,113,113,.15)}
+.rate-hard{border-color:rgba(251,191,36,.5)} .rate-hard:hover{background:rgba(251,191,36,.15)}
+.rate-good{border-color:rgba(52,211,153,.5)} .rate-good:hover{background:rgba(52,211,153,.15)}
+.rate-easy{border-color:rgba(96,165,250,.5)} .rate-easy:hover{background:rgba(96,165,250,.15)}
+.session-done{text-align:center;padding:3rem 1rem}
+.session-done .big{font-size:40px;margin-bottom:.5rem}
+/* Pomodoro */
+.pomo{display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:1.25rem}
+.pomo-time{font-size:22px;font-weight:800;font-family:'Sora',sans-serif;min-width:70px}
+.pomo-mode{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pomo-btns{display:flex;gap:6px;margin-left:auto}
+/* Planner */
+.exam-card{border-left:3px solid var(--accent);padding-left:14px;margin-bottom:1.25rem}
+.exam-card h3{font-size:15px}
+.countdown{font-size:12px;color:var(--amber);font-weight:700;margin-top:2px}
+.day-group{margin-top:.75rem}
+.day-group .day-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;font-weight:700}
+.topic-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px}
+.topic-item input{width:auto}
+.topic-item.done label,.topic-item.done span{text-decoration:line-through;color:var(--muted)}
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center}
+.stat-box .num{font-size:26px;font-weight:800;font-family:'Sora',sans-serif;color:var(--accent)}
+.stat-box .lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+/* Upgrade */
+.pro-features{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:1rem 0}
+.pro-features li{list-style:none;font-size:13px;padding:4px 0}
+.status-msg{font-size:12px;margin-top:8px;min-height:16px}
+.status-ok{color:var(--accent)} .status-err{color:var(--danger)}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border2);padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateY(0)}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:absolute;top:0;left:0;width:100%}
+  .print-card{page-break-inside:avoid;border:1px dashed #000;padding:14px;margin-bottom:10px}
+}
+@media(max-width:760px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;overflow-x:auto}
+  .nav{flex-direction:row;margin-top:0}
+  .side-stats,.pro-badge{display:none}
+  .main{padding:1.25rem}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div>
+      <div class="logo">Flashly<span>Study App</span></div>
+    </div>
+    <div class="nav" id="navList"></div>
+    <div class="side-stats" id="sideStats"></div>
+    <div id="proBadgeSlot"></div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="printArea" style="display:none"></div>
+
+<script>
+/* ---------- Storage ---------- */
+const STORAGE_KEY = 'flashly_v1';
+const FREE_MAX_DECKS = 2;
+const FREE_MAX_CARDS_PER_DECK = 30;
+const FREE_MAX_EXAMS = 1;
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function addDays(iso, n){ const d = new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000); }
+
+function defaultData(){
+  return {
+    decks: [],
+    exams: [],
+    settings: { pro:false, licenseKey:'', pomoWork:25, pomoBreak:5 },
+    stats: { studyMinutesTotal:0, cardsReviewedTotal:0, lastStudyDate:null, streakDays:0 }
+  };
+}
+
+let state = load();
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultData();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultData(), parsed);
+  }catch(e){ return defaultData(); }
+}
+function save(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ toast('⚠️ Could not save — your browser storage may be full or blocked.'); }
+}
+
+/* ---------- Toast ---------- */
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+}
+
+/* ---------- SM-2-ish scheduling ---------- */
+function scheduleCard(card, rating){
+  // rating: 0 again, 1 hard, 2 good, 3 easy
+  card.ease = card.ease || 2.5;
+  card.reps = card.reps || 0;
+  card.interval = card.interval || 0;
+  if(rating === 0){
+    card.reps = 0;
+    card.interval = 1;
+    card.ease = Math.max(1.3, card.ease - 0.2);
+    card.lapses = (card.lapses||0) + 1;
+  } else {
+    card.reps += 1;
+    if(card.reps === 1) card.interval = 1;
+    else if(card.reps === 2) card.interval = 6;
+    else card.interval = Math.round(card.interval * card.ease);
+    if(rating === 1) card.ease = Math.max(1.3, card.ease - 0.15);
+    if(rating === 3) card.ease = card.ease + 0.15;
+  }
+  card.dueDate = addDays(todayISO(), card.interval);
+  card.lastReviewed = todayISO();
+}
+
+/* ---------- Views ---------- */
+const NAV = [
+  {id:'study', label:'📚 Study'},
+  {id:'decks', label:'🗂️ Decks'},
+  {id:'planner', label:'📅 Planner'},
+  {id:'stats', label:'📊 Stats'},
+  {id:'upgrade', label:'✨ Upgrade'},
+];
+let currentView = 'study';
+let studySession = null; // {deckIds, queue, index, showBack, sessionStart}
+let pomo = { mode:'work', secondsLeft: state.settings.pomoWork*60, running:false, timer:null };
+
+function setView(v){ currentView = v; studySession = null; render(); }
+
+function render(){
+  renderNav();
+  renderSideStats();
+  renderProBadge();
+  const main = document.getElementById('main');
+  if(currentView === 'study') main.innerHTML = renderStudy();
+  else if(currentView === 'decks') main.innerHTML = renderDecks();
+  else if(currentView === 'planner') main.innerHTML = renderPlanner();
+  else if(currentView === 'stats') main.innerHTML = renderStats();
+  else if(currentView === 'upgrade') main.innerHTML = renderUpgrade();
+  wireView();
+}
+
+function renderNav(){
+  document.getElementById('navList').innerHTML = NAV.map(n =>
+    `<div class="nav-item ${currentView===n.id?'active':''}" data-nav="${n.id}">${n.label}</div>`
+  ).join('');
+}
+
+function renderSideStats(){
+  const totalCards = state.decks.reduce((s,d)=>s+d.cards.length,0);
+  const due = dueCards().length;
+  document.getElementById('sideStats').innerHTML =
+    `<div><b>${totalCards}</b> cards</div><div style="margin-top:4px"><b>${due}</b> due today</div>
+     <div style="margin-top:4px">🔥 <b>${state.stats.streakDays}</b> day streak</div>`;
+}
+
+function renderProBadge(){
+  const slot = document.getElementById('proBadgeSlot');
+  if(state.settings.pro){
+    slot.innerHTML = `<div class="pro-badge">✨ <b>Flashly Pro</b><br>Unlimited decks & cards</div>`;
+  } else {
+    const usedDecks = state.decks.length;
+    slot.innerHTML = `<div class="pro-badge">Free plan<br><span class="muted">${usedDecks}/${FREE_MAX_DECKS} decks used</span>
+      <a class="upgrade-link" data-nav="upgrade">Unlock Pro</a></div>`;
+  }
+}
+
+/* ---- Study ---- */
+function dueCards(deckFilter){
+  const t = todayISO();
+  let cards = [];
+  state.decks.forEach(d=>{
+    if(deckFilter && !deckFilter.includes(d.id)) return;
+    d.cards.forEach(c=>{
+      if(!c.dueDate || c.dueDate <= t) cards.push({...c, deckId:d.id, deckName:d.name});
+    });
+  });
+  return cards;
+}
+
+function renderStudy(){
+  if(studySession){
+    return renderStudySession();
+  }
+  const decks = state.decks;
+  const totalDue = dueCards().length;
+  let deckOptions = decks.map(d=>{
+    const due = dueCards([d.id]).length;
+    return `<div class="deck-row">
+      <div><div class="name">${escapeHtml(d.name)}</div>
+      <div class="meta">${d.cards.length} cards ${due?`<span class="pill due">${due} due</span>`:'<span class="pill">all caught up</span>'}</div></div>
+      <button class="btn btn-accent btn-sm" data-study-deck="${d.id}" ${due===0?'disabled':''}>Study</button>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="view-header">
+    <div><h1>Study</h1><p>Spaced repetition reviews cards right before you'd forget them — less time, better recall.</p></div>
+    <div class="top-actions">
+      <button class="btn btn-accent" id="studyAllBtn" ${totalDue===0?'disabled':''}>▶ Study all due (${totalDue})</button>
+    </div>
+  </div>
+  ${renderPomodoro()}
+  <div class="card">
+    <div class="card-title">Your decks</div>
+    ${decks.length? `<div class="deck-list">${deckOptions}</div>` : `<div class="empty">No decks yet. Head to <b>Decks</b> to create your first one.</div>`}
+  </div>`;
+}
+
+function renderPomodoro(){
+  const mins = String(Math.floor(pomo.secondsLeft/60)).padStart(2,'0');
+  const secs = String(pomo.secondsLeft%60).padStart(2,'0');
+  return `<div class="pomo">
+    <div>
+      <div class="pomo-time">${mins}:${secs}</div>
+      <div class="pomo-mode">${pomo.mode === 'work' ? 'Focus session' : 'Break'}</div>
+    </div>
+    <div class="pomo-btns">
+      <button class="btn btn-sm" id="pomoToggle">${pomo.running?'Pause':'Start'}</button>
+      <button class="btn btn-sm" id="pomoReset">Reset</button>
+    </div>
+  </div>`;
+}
+
+function renderStudySession(){
+  const s = studySession;
+  if(s.index >= s.queue.length){
+    const mins = Math.max(1, Math.round((Date.now()-s.sessionStart)/60000));
+    return `<div class="study-stage">
+      <div class="session-done">
+        <div class="big">🎉</div>
+        <h2>Session complete</h2>
+        <p class="muted" style="margin-top:8px">Reviewed ${s.queue.length} cards in ~${mins} min.</p>
+        <button class="btn btn-accent" style="margin-top:20px" id="backToStudy">Back to Study</button>
+      </div>
+    </div>`;
+  }
+  const card = s.queue[s.index];
+  const pct = Math.round((s.index/s.queue.length)*100);
+  return `<div class="study-stage">
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="muted" style="font-size:12px;margin-bottom:10px">${s.index+1} / ${s.queue.length} · ${escapeHtml(card.deckName)}</div>
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="flipCard">
+        <div>${escapeHtml(s.showBack ? card.back : card.front)}</div>
+      </div>
+    </div>
+    <div class="hint">${s.showBack? 'Rate how well you knew it' : 'Click card or press Space to flip'}</div>
+    ${s.showBack ? `<div class="rate-row">
+      <div class="rate-btn rate-again" data-rate="0"><b>Again</b><small>&lt;1 day</small></div>
+      <div class="rate-btn rate-hard" data-rate="1"><b>Hard</b><small>soon</small></div>
+      <div class="rate-btn rate-good" data-rate="2"><b>Good</b><small>on track</small></div>
+      <div class="rate-btn rate-easy" data-rate="3"><b>Easy</b><small>longer</small></div>
+    </div>` : ''}
+  </div>`;
+}
+
+function startSession(deckIds){
+  const queue = dueCards(deckIds || null);
+  if(queue.length === 0){ toast('Nothing due right now 🎉'); return; }
+  // shuffle
+  for(let i=queue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [queue[i],queue[j]]=[queue[j],queue[i]]; }
+  studySession = { queue, index:0, showBack:false, sessionStart:Date.now() };
+  render();
+}
+
+function rateCurrent(rating){
+  const s = studySession;
+  const cardRef = s.queue[s.index];
+  const deck = state.decks.find(d=>d.id===cardRef.deckId);
+  const real = deck.cards.find(c=>c.id===cardRef.id);
+  scheduleCard(real, rating);
+  state.stats.cardsReviewedTotal += 1;
+  bumpStreak();
+  save();
+  s.index += 1;
+  s.showBack = false;
+  render();
+}
+
+function bumpStreak(){
+  const t = todayISO();
+  if(state.stats.lastStudyDate === t) return;
+  if(state.stats.lastStudyDate === addDays(t,-1)){ state.stats.streakDays += 1; }
+  else { state.stats.streakDays = 1; }
+  state.stats.lastStudyDate = t;
+}
+
+/* ---- Decks ---- */
+function renderDecks(){
+  const atDeckLimit = !state.settings.pro && state.decks.length >= FREE_MAX_DECKS;
+  const decks = state.decks.map(d=>{
+    const atCardLimit = !state.settings.pro && d.cards.length >= FREE_MAX_CARDS_PER_DECK;
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div class="card-title" style="margin-bottom:0">${escapeHtml(d.name)} <span class="muted" style="font-weight:400">(${d.cards.length} cards${!state.settings.pro?`/${FREE_MAX_CARDS_PER_DECK}`:''})</span></div>
+        <div class="top-actions">
+          ${state.settings.pro ? `<button class="btn btn-sm" data-export="${d.id}">Export CSV</button><button class="btn btn-sm" data-print="${d.id}">Print</button>` : ''}
+          <button class="btn btn-sm btn-danger" data-del-deck="${d.id}">Delete deck</button>
+        </div>
+      </div>
+      <div class="field" style="margin-top:.75rem">
+        <label>Add cards — one per line, formatted as <code>front :: back</code></label>
+        <textarea data-bulk="${d.id}" placeholder="Mitochondria :: Powerhouse of the cell&#10;Federalist Papers :: Essays supporting ratification of the US Constitution"></textarea>
+        <div class="top-actions" style="margin-top:8px">
+          <button class="btn btn-accent btn-sm" data-add-bulk="${d.id}" ${atCardLimit?'disabled':''}>Add cards</button>
+          ${atCardLimit?'<span class="muted" style="font-size:12px;align-self:center">Free plan card limit reached — upgrade for unlimited.</span>':''}
+        </div>
+      </div>
+      ${d.cards.length ? `<div style="margin-top:.5rem;max-height:180px;overflow:auto">${d.cards.map(c=>`
+        <div class="topic-item" style="justify-content:space-between">
+          <span style="flex:1">${escapeHtml(c.front)} → ${escapeHtml(c.back)}</span>
+          <button class="btn btn-sm btn-danger" data-del-card="${d.id}|${c.id}">✕</button>
+        </div>`).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="view-header">
+    <div><h1>Decks</h1><p>Paste your notes as pairs and build a deck in seconds — no manual index cards.</p></div>
+  </div>
+  ${atDeckLimit ? `<div class="limit-banner">You've hit the Free plan's ${FREE_MAX_DECKS}-deck limit. <a data-nav="upgrade" style="text-decoration:underline;cursor:pointer">Upgrade to Pro</a> for unlimited decks.</div>` : ''}
+  <div class="card">
+    <div class="card-title">New deck</div>
+    <div class="row">
+      <input type="text" id="newDeckName" placeholder="e.g. Bio 201 — Midterm 2" />
+      <button class="btn btn-accent" id="createDeckBtn" style="flex:0 0 auto" ${atDeckLimit?'disabled':''}>+ Create deck</button>
+    </div>
+  </div>
+  ${decks || `<div class="empty">No decks yet — create one above.</div>`}
+  `;
+}
+
+function parseBulk(text){
+  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  const cards = [];
+  lines.forEach(line=>{
+    let sep = line.includes('::') ? '::' : (line.includes('\t') ? '\t' : (line.includes(' - ') ? ' - ' : null));
+    if(!sep) return;
+    const idx = line.indexOf(sep);
+    const front = line.slice(0, idx).trim();
+    const back = line.slice(idx+sep.length).trim();
+    if(front && back) cards.push({ id: uid(), front, back, ease:2.5, reps:0, interval:0, dueDate: todayISO() });
+  });
+  return cards;
+}
+
+/* ---- Planner ---- */
+function renderPlanner(){
+  const atExamLimit = !state.settings.pro && state.exams.length >= FREE_MAX_EXAMS;
+  const exams = state.exams.map(ex=>{
+    const daysLeft = daysBetween(todayISO(), ex.date);
+    const grouped = {};
+    ex.schedule.forEach(item=>{ (grouped[item.date] = grouped[item.date]||[]).push(item); });
+    const days = Object.keys(grouped).sort();
+    return `<div class="card exam-card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px">
+        <div>
+          <h3>${escapeHtml(ex.name)}</h3>
+          <div class="countdown">${daysLeft>=0? `${daysLeft} day${daysLeft===1?'':'s'} left` : 'Exam date passed'}</div>
+        </div>
+        <button class="btn btn-sm btn-danger" data-del-exam="${ex.id}">Delete</button>
+      </div>
+      ${days.map(day=>`
+        <div class="day-group">
+          <div class="day-label">${day === todayISO() ? 'Today · '+day : day}</div>
+          ${grouped[day].map(item=>`
+            <div class="topic-item ${item.done?'done':''}">
+              <input type="checkbox" data-toggle-topic="${ex.id}|${item.id}" ${item.done?'checked':''}/>
+              <span>${escapeHtml(item.topic)}</span>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="view-header">
+    <div><h1>Planner</h1><p>Enter your exam date and topics — get a day-by-day review schedule instead of one panicked cram session.</p></div>
+  </div>
+  ${atExamLimit ? `<div class="limit-banner">Free plan supports ${FREE_MAX_EXAMS} active exam plan. <a data-nav="upgrade" style="text-decoration:underline;cursor:pointer">Upgrade to Pro</a> to plan multiple exams at once.</div>` : `
+  <div class="card">
+    <div class="card-title">New exam plan</div>
+    <div class="row">
+      <div class="field" style="flex:2"><label>Exam / class name</label><input type="text" id="examName" placeholder="Organic Chemistry Final"/></div>
+      <div class="field"><label>Exam date</label><input type="date" id="examDate" min="${todayISO()}"/></div>
+    </div>
+    <div class="field"><label>Topics to review (comma-separated)</label>
+      <textarea id="examTopics" placeholder="SN1/SN2 reactions, Alkene addition, Aromaticity, Spectroscopy, Stereochemistry"></textarea>
+    </div>
+    <button class="btn btn-accent" id="createExamBtn">Generate schedule</button>
+  </div>`}
+  ${exams || `<div class="empty">No exam plans yet.</div>`}
+  `;
+}
+
+function buildSchedule(topics, examDate){
+  const days = Math.max(1, daysBetween(todayISO(), examDate));
+  const schedule = [];
+  topics.forEach((topic, i)=>{
+    const dayOffset = days <= 1 ? 0 : i % days;
+    schedule.push({ id: uid(), topic, date: addDays(todayISO(), dayOffset), done:false });
+  });
+  // Add a final review day covering everything, the day before the exam (or exam day if 0 days left)
+  const reviewDay = days <= 1 ? todayISO() : addDays(examDate, -1);
+  schedule.push({ id: uid(), topic: 'Full review — all topics', date: reviewDay, done:false });
+  return schedule.sort((a,b)=> a.date.localeCompare(b.date));
+}
+
+/* ---- Stats ---- */
+function renderStats(){
+  const totalCards = state.decks.reduce((s,d)=>s+d.cards.length,0);
+  const mastered = state.decks.reduce((s,d)=>s+d.cards.filter(c=>(c.interval||0) >= 21).length,0);
+  const dueNext7 = [0,1,2,3,4,5,6].map(n=>{
+    const d = addDays(todayISO(), n);
+    let count = 0;
+    state.decks.forEach(dk=>dk.cards.forEach(c=>{ if(c.dueDate === d) count++; }));
+    return {d, count};
+  });
+  const maxCount = Math.max(1, ...dueNext7.map(x=>x.count));
+  return `
+  <div class="view-header"><div><h1>Stats</h1><p>Your study footprint at a glance.</p></div></div>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="num">${totalCards}</div><div class="lbl">Total cards</div></div>
+    <div class="stat-box"><div class="num">${mastered}</div><div class="lbl">Mastered (21d+)</div></div>
+    <div class="stat-box"><div class="num">${state.stats.cardsReviewedTotal}</div><div class="lbl">Reviews done</div></div>
+    <div class="stat-box"><div class="num">🔥 ${state.stats.streakDays}</div><div class="lbl">Day streak</div></div>
+    <div class="stat-box"><div class="num">${state.stats.studyMinutesTotal}</div><div class="lbl">Minutes focused</div></div>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <div class="card-title">Cards due — next 7 days</div>
+    <div style="display:flex;align-items:flex-end;gap:10px;height:100px">
+      ${dueNext7.map(x=>`<div style="flex:1;text-align:center">
+        <div style="background:var(--accent);border-radius:4px;height:${Math.round((x.count/maxCount)*70)+4}px"></div>
+        <div class="muted" style="font-size:10px;margin-top:4px">${x.d.slice(5)}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ---- Upgrade ---- */
+function renderUpgrade(){
+  if(state.settings.pro){
+    return `<div class="view-header"><div><h1>Upgrade</h1></div></div>
+    <div class="card"><div class="card-title">✨ You're on Flashly Pro</div>
+    <p class="muted">Unlimited decks, unlimited cards, unlimited exam plans, CSV export, and print-friendly flashcards. Thanks for supporting Flashly.</p></div>`;
+  }
+  return `
+  <div class="view-header"><div><h1>Upgrade to Pro</h1><p>One-time payment. No subscription.</p></div></div>
+  <div class="card">
+    <div class="card-title">What Pro unlocks</div>
+    <ul class="pro-features">
+      <li>✅ Unlimited decks & cards</li>
+      <li>✅ Unlimited exam plans</li>
+      <li>✅ CSV export of any deck</li>
+      <li>✅ Print-friendly flashcards</li>
+      <li>✅ Custom Pomodoro lengths</li>
+      <li>✅ Lifetime access, one payment</li>
+    </ul>
+    <a class="btn btn-accent" href="https://gumroad.com/l/flashly-pro" target="_blank" rel="noopener">Buy Flashly Pro — $9</a>
+  </div>
+  <div class="card">
+    <div class="card-title">Already purchased? Enter your license key</div>
+    <div class="row">
+      <input type="text" id="licenseInput" placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"/>
+      <button class="btn btn-accent" id="verifyLicenseBtn" style="flex:0 0 auto">Verify</button>
+    </div>
+    <div class="status-msg" id="licenseStatus"></div>
+    <p class="muted" style="font-size:12px;margin-top:8px">Your license key comes in your Gumroad receipt email after purchase.</p>
+  </div>`;
+}
+
+async function verifyLicense(key){
+  const statusEl = document.getElementById('licenseStatus');
+  statusEl.className = 'status-msg';
+  statusEl.textContent = 'Verifying…';
+  try{
+    const res = await fetch('/.netlify/functions/verify-license', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ license_key: key })
+    });
+    const data = await res.json();
+    if(data.success){
+      state.settings.pro = true;
+      state.settings.licenseKey = key;
+      save();
+      statusEl.className = 'status-msg status-ok';
+      statusEl.textContent = '✅ Pro unlocked. Thank you!';
+      setTimeout(()=>render(), 700);
+    } else {
+      statusEl.className = 'status-msg status-err';
+      statusEl.textContent = '❌ ' + (data.message || 'Invalid license key.');
+    }
+  }catch(e){
+    statusEl.className = 'status-msg status-err';
+    statusEl.textContent = '⚠️ Could not verify right now — check your connection and try again.';
+  }
+}
+
+/* ---------- Wiring ---------- */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function wireView(){
+  document.querySelectorAll('[data-nav]').forEach(el=>{
+    el.onclick = ()=> setView(el.dataset.nav);
+  });
+
+  // Study
+  const studyAllBtn = document.getElementById('studyAllBtn');
+  if(studyAllBtn) studyAllBtn.onclick = ()=> startSession(null);
+  document.querySelectorAll('[data-study-deck]').forEach(el=>{
+    el.onclick = ()=> startSession([el.dataset.studyDeck]);
+  });
+  const flipCard = document.getElementById('flipCard');
+  if(flipCard) flipCard.onclick = ()=>{ studySession.showBack = !studySession.showBack; render(); };
+  document.querySelectorAll('[data-rate]').forEach(el=>{
+    el.onclick = ()=> rateCurrent(parseInt(el.dataset.rate,10));
+  });
+  const backBtn = document.getElementById('backToStudy');
+  if(backBtn) backBtn.onclick = ()=> { studySession=null; render(); };
+
+  // Pomodoro
+  const pomoToggle = document.getElementById('pomoToggle');
+  if(pomoToggle) pomoToggle.onclick = togglePomo;
+  const pomoReset = document.getElementById('pomoReset');
+  if(pomoReset) pomoReset.onclick = resetPomo;
+
+  // Decks
+  const createDeckBtn = document.getElementById('createDeckBtn');
+  if(createDeckBtn) createDeckBtn.onclick = ()=>{
+    const input = document.getElementById('newDeckName');
+    const name = input.value.trim();
+    if(!name) return toast('Give your deck a name first.');
+    if(!state.settings.pro && state.decks.length >= FREE_MAX_DECKS) return setView('upgrade');
+    state.decks.push({ id: uid(), name, cards: [], created: todayISO() });
+    save(); render();
+  };
+  document.querySelectorAll('[data-add-bulk]').forEach(el=>{
+    el.onclick = ()=>{
+      const deckId = el.dataset.addBulk;
+      const ta = document.querySelector(`[data-bulk="${deckId}"]`);
+      const deck = state.decks.find(d=>d.id===deckId);
+      let newCards = parseBulk(ta.value);
+      if(newCards.length === 0) return toast('No valid "front :: back" lines found.');
+      if(!state.settings.pro){
+        const room = FREE_MAX_CARDS_PER_DECK - deck.cards.length;
+        if(room <= 0) return setView('upgrade');
+        if(newCards.length > room){ newCards = newCards.slice(0, room); toast(`Added ${room} cards — Free plan limit reached.`); }
+      }
+      deck.cards.push(...newCards);
+      save(); ta.value=''; render();
+      if(!el.dataset.silent) toast(`Added ${newCards.length} card(s).`);
+    };
+  });
+  document.querySelectorAll('[data-del-deck]').forEach(el=>{
+    el.onclick = ()=>{
+      if(!confirm('Delete this deck and all its cards?')) return;
+      state.decks = state.decks.filter(d=>d.id!==el.dataset.delDeck);
+      save(); render();
+    };
+  });
+  document.querySelectorAll('[data-del-card]').forEach(el=>{
+    el.onclick = ()=>{
+      const [deckId, cardId] = el.dataset.delCard.split('|');
+      const deck = state.decks.find(d=>d.id===deckId);
+      deck.cards = deck.cards.filter(c=>c.id!==cardId);
+      save(); render();
+    };
+  });
+  document.querySelectorAll('[data-export]').forEach(el=>{
+    el.onclick = ()=> exportDeckCsv(el.dataset.export);
+  });
+  document.querySelectorAll('[data-print]').forEach(el=>{
+    el.onclick = ()=> printDeck(el.dataset.print);
+  });
+
+  // Planner
+  const createExamBtn = document.getElementById('createExamBtn');
+  if(createExamBtn) createExamBtn.onclick = ()=>{
+    const name = document.getElementById('examName').value.trim();
+    const date = document.getElementById('examDate').value;
+    const topicsRaw = document.getElementById('examTopics').value.trim();
+    if(!name || !date || !topicsRaw) return toast('Fill in name, date, and topics.');
+    const topics = topicsRaw.split(',').map(t=>t.trim()).filter(Boolean);
+    if(topics.length === 0) return toast('Add at least one topic.');
+    const schedule = buildSchedule(topics, date);
+    state.exams.push({ id: uid(), name, date, topics, schedule });
+    save(); render();
+  };
+  document.querySelectorAll('[data-del-exam]').forEach(el=>{
+    el.onclick = ()=>{
+      state.exams = state.exams.filter(e=>e.id!==el.dataset.delExam);
+      save(); render();
+    };
+  });
+  document.querySelectorAll('[data-toggle-topic]').forEach(el=>{
+    el.onchange = ()=>{
+      const [examId, itemId] = el.dataset.toggleTopic.split('|');
+      const ex = state.exams.find(e=>e.id===examId);
+      const item = ex.schedule.find(s=>s.id===itemId);
+      item.done = el.checked;
+      save();
+    };
+  });
+
+  // Upgrade
+  const verifyBtn = document.getElementById('verifyLicenseBtn');
+  if(verifyBtn) verifyBtn.onclick = ()=>{
+    const key = document.getElementById('licenseInput').value.trim();
+    if(!key) return toast('Paste your license key first.');
+    verifyLicense(key);
+  };
+
+  document.onkeydown = (e)=>{
+    if(currentView !== 'study' || !studySession) return;
+    if(studySession.index >= studySession.queue.length) return;
+    if(e.code === 'Space'){ e.preventDefault(); studySession.showBack = !studySession.showBack; render(); }
+    if(studySession.showBack && ['Digit1','Digit2','Digit3','Digit4'].includes(e.code)){
+      rateCurrent(parseInt(e.code.slice(-1),10) - 1);
+    }
+  };
+}
+
+/* ---------- Pomodoro logic ---------- */
+function togglePomo(){
+  pomo.running = !pomo.running;
+  if(pomo.running){
+    pomo.timer = setInterval(tickPomo, 1000);
+  } else {
+    clearInterval(pomo.timer);
+  }
+  render();
+}
+function resetPomo(){
+  clearInterval(pomo.timer);
+  pomo.running = false;
+  pomo.mode = 'work';
+  pomo.secondsLeft = state.settings.pomoWork*60;
+  render();
+}
+function tickPomo(){
+  pomo.secondsLeft -= 1;
+  if(pomo.secondsLeft <= 0){
+    if(pomo.mode === 'work'){
+      state.stats.studyMinutesTotal += state.settings.pomoWork;
+      bumpStreak(); save();
+      pomo.mode = 'break';
+      pomo.secondsLeft = state.settings.pomoBreak*60;
+      toast('⏱️ Focus session done — take a break!');
+    } else {
+      pomo.mode = 'work';
+      pomo.secondsLeft = state.settings.pomoWork*60;
+      toast('🔔 Break over — back to it!');
+    }
+  }
+  if(currentView === 'study') render();
+}
+
+/* ---------- CSV export / Print (Pro) ---------- */
+function exportDeckCsv(deckId){
+  const deck = state.decks.find(d=>d.id===deckId);
+  const rows = [['front','back'], ...deck.cards.map(c=>[c.front, c.back])];
+  const csv = rows.map(r=> r.map(f=>`"${String(f).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${deck.name.replace(/[^a-z0-9]+/gi,'-')}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function printDeck(deckId){
+  const deck = state.decks.find(d=>d.id===deckId);
+  const area = document.getElementById('printArea');
+  area.innerHTML = `<h1>${escapeHtml(deck.name)}</h1>` + deck.cards.map(c=>
+    `<div class="print-card"><b>Q:</b> ${escapeHtml(c.front)}<br><b>A:</b> ${escapeHtml(c.back)}</div>`).join('');
+  area.style.display = 'block';
+  window.print();
+  area.style.display = 'none';
+}
+
+/* ---------- Init ---------- */
+render();
+</script>
+</body>
+</html>
