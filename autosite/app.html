@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopFront AI — Site &amp; Outreach Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/autosite/" class="logo">Shop<span class="logo-accent">Front</span> AI</a>
+      <div class="nav-links">
+        <a href="/autosite/">Home</a>
+        <a href="/autosite/playbook.html">12-Hour Playbook</a>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle">☰</button>
+    </div>
+  </nav>
+
+  <div class="app-page">
+    <div class="container">
+      <div class="app-header">
+        <h1>Lead → Live Preview → Outreach, in one pass</h1>
+        <p>Paste in what you see on the business's Google listing. Get a real site preview, a downloadable HTML file, and a personalized outreach script — instantly.</p>
+      </div>
+
+      <div class="app-layout">
+        <div class="panel">
+          <h2>1. Business Details</h2>
+          <form id="leadForm">
+            <div class="form-group">
+              <label>Business Name</label>
+              <input type="text" id="bizName" placeholder="Ironwood Auto Repair" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Category</label>
+                <select id="bizCategory">
+                  <option>Auto Repair Shop</option>
+                  <option>HVAC Contractor</option>
+                  <option>Plumber</option>
+                  <option>Mobile Detailing</option>
+                  <option>Towing Company</option>
+                  <option>Landscaping</option>
+                  <option>Other Local Service</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>City, State</label>
+                <input type="text" id="bizCity" placeholder="Tempe, AZ">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Google Rating</label>
+                <input type="text" id="bizRating" placeholder="4.9" value="4.9">
+              </div>
+              <div class="form-group">
+                <label># of Reviews</label>
+                <input type="text" id="bizReviews" placeholder="212" value="212">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="text" id="bizPhone" placeholder="(480) 555-0134">
+            </div>
+            <div class="form-group">
+              <label>Address</label>
+              <input type="text" id="bizAddress" placeholder="1420 W Broadway Rd, Tempe, AZ">
+            </div>
+            <div class="form-group">
+              <label>Top Services (comma separated)</label>
+              <textarea id="bizServices" placeholder="Brakes, Oil Changes, Check Engine Diagnostics, AC Repair, Alignments">Brakes, Oil Changes, Check Engine Diagnostics, AC Repair, Alignments</textarea>
+            </div>
+            <div class="form-group">
+              <label>Paste 2–3 real Google reviews (one per line)</label>
+              <textarea id="bizReviewQuotes" placeholder="Honest pricing and they explained everything before doing the work. — Sarah M.">Honest pricing and they explained everything before doing the work. — Sarah M.
+Got me in same day and the truck's never run better. — Derek T.
+Only shop I trust with my car. Fast, fair, and friendly every time. — Priya K.</textarea>
+            </div>
+            <div class="form-group">
+              <label>Owner contact name (for outreach personalization)</label>
+              <input type="text" id="ownerName" placeholder="Mike">
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-full">Generate Preview + Outreach</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="preview-wrap">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="preview">Live Site Preview</button>
+            <button class="tab-btn" data-tab="outreach">Outreach Scripts</button>
+            <button class="tab-btn" data-tab="leads">Lead Tracker</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-preview">
+            <div class="preview-frame">
+              <div class="preview-toolbar">
+                <span id="previewFileName">preview_new-lead.html</span>
+                <button class="btn btn-dark btn-sm" id="downloadSiteBtn">⬇ Download Site HTML</button>
+              </div>
+              <div class="preview-body">
+                <iframe id="siteFrame" style="width:100%; height:640px; border:none;"></iframe>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-outreach">
+            <div class="panel">
+              <h2>Cold Email</h2>
+              <div class="output-box" id="outEmail"></div>
+              <div class="copy-hint">Select all in the box and copy, or use the button below.</div>
+              <div class="form-actions"><button class="btn btn-outline btn-sm" data-copy="outEmail">Copy Email</button></div>
+
+              <h2 style="margin-top:24px;">SMS / Text</h2>
+              <div class="output-box" id="outSms"></div>
+              <div class="form-actions"><button class="btn btn-outline btn-sm" data-copy="outSms">Copy Text</button></div>
+
+              <h2 style="margin-top:24px;">Walk-In / Phone Script</h2>
+              <div class="output-box" id="outCall"></div>
+              <div class="form-actions"><button class="btn btn-outline btn-sm" data-copy="outCall">Copy Script</button></div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-leads">
+            <div class="panel">
+              <h2>Leads (saved on this device)</h2>
+              <table class="lead-table">
+                <thead><tr><th>Business</th><th>City</th><th>Rating</th><th>Status</th><th></th></tr></thead>
+                <tbody id="leadTableBody"></tbody>
+              </table>
+              <p class="copy-hint">Saved locally in your browser. Add a lead by generating a preview for it above — it's tracked automatically.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

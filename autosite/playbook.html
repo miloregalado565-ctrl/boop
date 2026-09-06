@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopFront AI — 12-Hour Playbook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/autosite/" class="logo">Shop<span class="logo-accent">Front</span> AI</a>
+      <div class="nav-links">
+        <a href="/autosite/">Home</a>
+        <a href="/autosite/app.html">Generator Tool</a>
+      </div>
+      <button class="mobile-toggle" id="mobileToggle">☰</button>
+    </div>
+  </nav>
+
+  <div class="playbook">
+    <h1>The 12-Hour Playbook</h1>
+    <p class="lead">This is the part I can't automate for you: contacting real businesses and taking payment. Everything else — finding candidates, building the site, writing the outreach — is done in the <a href="/autosite/app.html">generator tool</a>. Follow this in order.</p>
+
+    <div class="pb-hour">
+      <h2>HOUR 0–1 · Get paid before you sell anything</h2>
+      <p>Create a free Stripe account and make a <strong>Payment Link</strong> (Stripe Dashboard → Payment links → New) for $397 "Website Build" and one for $97/mo "Managed Website." No code needed. Keep both links handy — you'll drop them straight into replies. This is the single step that turns a "yes" into money in your account, so do it first.</p>
+    </div>
+
+    <div class="pb-hour">
+      <h2>HOUR 1–3 · Build a list of 20–30 qualified leads</h2>
+      <p>Open Google Maps. Search <code>auto repair near [your city]</code> (or HVAC, plumbing, mobile detailing — auto repair has the highest no-website rate: ~45%). For each result:</p>
+      <ul>
+        <li>Rating 4.5★ or higher, 30+ reviews (proof they're good and active)</li>
+        <li>Click the listing — no "Website" button, or a broken/Facebook-only link</li>
+        <li>Note: name, city, rating, review count, phone, address, top services, and copy 2–3 of their actual review text</li>
+      </ul>
+      <p>Put this in a simple spreadsheet or notes doc. Aim for 20–30 rows — that volume is what makes the numbers work, since even a great cold outreach converts a small percentage.</p>
+    </div>
+
+    <div class="pb-hour">
+      <h2>HOUR 3–5 · Generate a preview + outreach for every lead</h2>
+      <p>Open the <a href="/autosite/app.html">generator tool</a>. For each business: paste in its details, hit Generate. You instantly get (1) a live one-page site preview you can actually open and click through, (2) a downloadable HTML file, and (3) a personalized email, text, and phone script referencing their real rating and reviews. The lead is auto-saved to the tracker tab so nothing gets lost.</p>
+      <p>Do this for all 20–30 leads before you send a single message — batching this way is what makes it fast.</p>
+    </div>
+
+    <div class="pb-hour">
+      <h2>HOUR 5–8 · Send outreach — phone first, then text/email</h2>
+      <p>Phone calls close same-day; email/text sit in an inbox. Priority order:</p>
+      <ul>
+        <li><strong>Call</strong> using the phone script — ask for the owner by name if you have it, otherwise "whoever handles the website"</li>
+        <li><strong>Text</strong> immediately after a call (even a good one) with the preview link — most people say yes after they actually see it</li>
+        <li><strong>Email</strong> anyone you can't reach by phone, attaching or linking the downloaded HTML preview</li>
+      </ul>
+      <p>Mark each lead's status in the tracker tab as you go: Found → Contacted → Replied → Closed.</p>
+    </div>
+
+    <div class="pb-hour">
+      <h2>HOUR 8–10 · Handle replies and close</h2>
+      <p>When someone says "send me the link" or "how much" — that's a warm lead. Send the preview + one of your two Stripe payment links directly. Most objections are price or trust; the phone script's objection lines cover both. Don't discount below $397/$97 on the first call — hold price, offer to walk them through the preview live on a call instead.</p>
+    </div>
+
+    <div class="pb-hour">
+      <h2>HOUR 10–12 · Deliver on any "yes"</h2>
+      <p>Once paid: point their domain (or set up a subdomain/new one via Netlify/Vercel, both free for a single static page) to the downloaded HTML file, or host it for them if they bought Managed. Send them the live link. That's a closed sale, delivered, same day.</p>
+    </div>
+
+    <div class="pb-hour" style="border-left-color:#2EC4B6;">
+      <h2 style="color:#2EC4B6;">Reality check</h2>
+      <p>This plan gets you from zero to "in front of paying customers" within 12 hours if you actually make the calls and sends — I can't do that outreach for you, and I won't fabricate a guaranteed sale. Cold outreach conversion is realistically single-digit to low-double-digit percent even done well, which is why the lead list needs to be 20–30 deep, not 3–5.</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
