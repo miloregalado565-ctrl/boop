@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Osteo Atlas — Bone Landmark Study Guide</title>
+<meta name="description" content="A comprehensive, searchable atlas of human bones and their landmarks (processes, fossae, foramina, sutures, and more) with flashcards, quizzes, and a timed knowledge test." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <header class="topbar glass">
+    <div class="brand"><span class="dot"></span> Osteo Atlas</div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="study" class="active">Study</button>
+      <button data-tab="diagram">Diagram</button>
+      <button data-tab="flash">Flashcards</button>
+      <button data-tab="quiz">Test Your Knowledge</button>
+      <button data-tab="exam">Knowledge Test</button>
+      <button data-tab="progress">Progress</button>
+    </nav>
+    <div class="stats">
+      <span>Bones: <b id="stat-bones">0</b></span>
+      <span>Landmarks: <b id="stat-parts">0</b></span>
+      <span>Mastered: <b id="stat-mastered">0</b></span>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="glass">
+    <h3>Search</h3>
+    <input id="search-input" type="text" placeholder="Search bones or landmarks…" />
+    <h3>Browse</h3>
+    <div id="bone-nav"></div>
+  </aside>
+
+  <main id="main">
+
+    <!-- STUDY -->
+    <section class="panel glass tab-panel" id="tab-study">
+      <div id="study-content"></div>
+    </section>
+
+    <!-- DIAGRAM -->
+    <section class="panel glass tab-panel" id="tab-diagram" style="display:none">
+      <h2>Interactive Diagram</h2>
+      <div class="sub">Click a point to identify the bone. Approximate, labeled 2D landmarks — built for quick recognition, not photorealistic 3D.</div>
+      <div class="diagram-picker">
+        <button class="glass-btn active" data-diagram="skeleton">Full Skeleton (Anterior)</button>
+        <button class="glass-btn" data-diagram="skull">Skull (Anterior)</button>
+      </div>
+      <div id="diagram-wrap">
+        <div id="diagram-svg-holder" class="glass" style="padding:16px;border-radius:16px;"></div>
+        <div class="diagram-info glass" style="padding:18px;border-radius:16px;">
+          <div id="diagram-info-content">
+            <p class="sub" style="margin:0">Click any highlighted point on the diagram to see the bone here, then jump to the full study entry.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLASHCARDS -->
+    <section class="panel glass tab-panel" id="tab-flash" style="display:none">
+      <h2>Flashcards</h2>
+      <div class="sub">Tap the card to flip. Mark whether you knew it — missed cards come back sooner.</div>
+      <div class="filter-row">
+        <select id="flash-group-filter">
+          <option value="all">All bones</option>
+        </select>
+        <button class="glass-btn" id="flash-restart">Restart Deck</button>
+      </div>
+      <div class="flash-wrap">
+        <div class="flash-progress" id="flash-progress"></div>
+        <div class="flashcard glass" id="flashcard"></div>
+        <div class="flash-controls">
+          <button class="glass-btn" id="flash-dont-know">✗ Didn't know</button>
+          <button class="glass-btn primary" id="flash-know">✓ Knew it</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ (Test Your Knowledge) -->
+    <section class="panel glass tab-panel" id="tab-quiz" style="display:none">
+      <h2>Test Your Knowledge</h2>
+      <div id="quiz-content"></div>
+    </section>
+
+    <!-- EXAM (Knowledge Test) -->
+    <section class="panel glass tab-panel" id="tab-exam" style="display:none">
+      <h2>Knowledge Test</h2>
+      <div id="exam-content"></div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section class="panel glass tab-panel" id="tab-progress" style="display:none">
+      <h2>Your Progress</h2>
+      <div id="progress-content"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
