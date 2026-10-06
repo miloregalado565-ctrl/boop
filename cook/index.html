@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0b12">
+<title>Fridge Chef</title>
+<style>
+:root{
+  --bg:#0b0b12; --ink:#f6f5ff; --mute:#a9a7c4; --acc:#ff7a45; --acc2:#ffc247; --good:#4ade80;
+  --glass:rgba(255,255,255,.10); --glass-b:rgba(255,255,255,.22); --r:26px;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+/* animated aurora backdrop makes the glass actually look like glass */
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden}
+.aurora i{position:absolute;width:70vmax;height:70vmax;border-radius:50%;filter:blur(70px);opacity:.55;animation:drift 18s ease-in-out infinite alternate}
+.aurora i:nth-child(1){background:#ff5e3a;left:-25vmax;top:-20vmax}
+.aurora i:nth-child(2){background:#7c3aed;right:-30vmax;top:10vmax;animation-delay:-6s}
+.aurora i:nth-child(3){background:#0ea5a5;left:5vmax;bottom:-35vmax;animation-delay:-11s}
+@keyframes drift{to{transform:translate(8vmax,6vmax) scale(1.15)}}
+.glass{background:var(--glass);border:1px solid var(--glass-b);border-radius:var(--r);
+  backdrop-filter:blur(26px) saturate(1.8);-webkit-backdrop-filter:blur(26px) saturate(1.8);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 40px rgba(0,0,0,.35)}
+#app{position:relative;z-index:1;height:100%;max-width:520px;margin:0 auto}
+.screen{position:absolute;inset:0;padding:calc(var(--safe-t) + 18px) 18px calc(110px + var(--safe-b));
+  overflow-y:auto;opacity:0;pointer-events:none;transform:translateY(14px) scale(.985);
+  transition:opacity .28s,transform .28s}
+.screen.on{opacity:1;pointer-events:auto;transform:none}
+h1{font-size:34px;letter-spacing:-.03em;margin:6px 0 2px;line-height:1.05}
+h2{font-size:22px;margin:22px 0 10px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 18px}
+.row{display:flex;gap:10px;align-items:center}
+.sp{flex:1}
+.pill{padding:8px 14px;border-radius:99px;font-weight:600;font-size:14px;white-space:nowrap}
+.stat{display:flex;gap:10px;margin:14px 0}
+.stat .glass{flex:1;padding:12px 14px;border-radius:20px}
+.stat b{display:block;font-size:22px}
+.stat span{font-size:12px;color:var(--mute)}
+.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:9px;transition:width .6s}
+.cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:20px;border-radius:26px;
+  font-size:20px;font-weight:800;color:#2a1200;background:linear-gradient(135deg,var(--acc2),var(--acc));
+  box-shadow:0 14px 40px rgba(255,122,69,.45),inset 0 2px 0 rgba(255,255,255,.5);transition:transform .15s}
+.cta:active{transform:scale(.96)}
+.cta.sec{background:var(--glass);color:var(--ink);box-shadow:none;border:1px solid var(--glass-b);font-size:16px;padding:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 12px;border-radius:99px;font-weight:600;font-size:14px;background:var(--glass);border:1px solid var(--glass-b);transition:.15s}
+.chip.off{opacity:.35;text-decoration:line-through}
+.chip.sel{background:linear-gradient(135deg,var(--acc2),var(--acc));color:#2a1200;border-color:transparent}
+.card{padding:16px;margin-bottom:12px;display:block;width:100%;text-align:left;animation:pop .45s both}
+@keyframes pop{from{opacity:0;transform:translateY(18px) scale(.97)}}
+.card .t{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.card .emo{font-size:40px;float:right;margin-left:10px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.meta span{font-size:12px;padding:4px 9px;border-radius:99px;background:rgba(255,255,255,.12)}
+.miss{color:var(--acc2)}
+.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + var(--safe-b));z-index:5;
+  display:flex;gap:4px;padding:6px;border-radius:99px;width:min(340px,calc(100% - 36px))}
+.tabs button{flex:1;padding:10px 0;border-radius:99px;font-size:12px;font-weight:600;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:1px}
+.tabs button b{font-size:20px;font-weight:400}
+.tabs button.on{background:rgba(255,255,255,.18);color:var(--ink)}
+/* camera */
+#cam{position:fixed;inset:0;z-index:10;background:#000;display:none}
+#cam.on{display:block}
+#cam video{width:100%;height:100%;object-fit:cover}
+#cam .top{position:absolute;top:calc(var(--safe-t) + 14px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:center}
+#cam .hint{position:absolute;top:calc(var(--safe-t) + 70px);left:0;right:0;text-align:center}
+#cam .hint span{display:inline-block;padding:8px 16px;border-radius:99px}
+#cam .ctrl{position:absolute;bottom:calc(30px + var(--safe-b));left:0;right:0;display:flex;align-items:center;justify-content:space-around}
+.shutter{width:82px;height:82px;border-radius:50%;border:5px solid #fff;background:rgba(255,255,255,.25);position:relative;transition:transform .12s}
+.shutter:active{transform:scale(.9)}
+.shutter::after{content:"";position:absolute;inset:6px;border-radius:50%;background:#fff}
+.round{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:22px}
+.frame{position:absolute;inset:22% 9% 28%;border-radius:30px;pointer-events:none;
+  background:linear-gradient(#fff,#fff) top left/34px 4px no-repeat,linear-gradient(#fff,#fff) top left/4px 34px no-repeat,
+  linear-gradient(#fff,#fff) top right/34px 4px no-repeat,linear-gradient(#fff,#fff) top right/4px 34px no-repeat,
+  linear-gradient(#fff,#fff) bottom left/34px 4px no-repeat,linear-gradient(#fff,#fff) bottom left/4px 34px no-repeat,
+  linear-gradient(#fff,#fff) bottom right/34px 4px no-repeat,linear-gradient(#fff,#fff) bottom right/4px 34px no-repeat;opacity:.8}
+/* loading */
+#load{position:fixed;inset:0;z-index:20;display:none;place-items:center;text-align:center;background:rgba(8,8,14,.8);backdrop-filter:blur(20px)}
+#load.on{display:grid}
+#load .pic{width:200px;height:200px;border-radius:32px;object-fit:cover;position:relative;margin:0 auto 22px;display:block}
+.scanwrap{position:relative;width:200px;margin:0 auto 22px;border-radius:32px;overflow:hidden}
+.scanwrap img{width:200px;height:200px;object-fit:cover;display:block}
+.scanwrap::after{content:"";position:absolute;left:0;right:0;height:60px;top:-60px;background:linear-gradient(transparent,rgba(255,194,71,.8));animation:scan 1.6s linear infinite}
+@keyframes scan{to{top:200px}}
+.dots span{animation:blink 1.2s infinite}.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{50%{opacity:.2}}
+/* sheets */
+.sheet{position:fixed;inset:0;z-index:15;display:none;background:rgba(0,0,0,.5);align-items:flex-end}
+.sheet.on{display:flex}
+.sheet .in{width:100%;max-width:520px;margin:0 auto;padding:22px 20px calc(24px + var(--safe-b));border-radius:34px 34px 0 0;max-height:92%;overflow-y:auto;background:rgba(24,22,38,.82);animation:up .35s}
+@keyframes up{from{transform:translateY(100%)}}
+.step{padding:14px;border-radius:20px;margin-bottom:10px;display:flex;gap:12px}
+.step .n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--acc2),var(--acc));color:#2a1200}
+.cookbig{font-size:26px;line-height:1.3;font-weight:600;letter-spacing:-.01em;min-height:150px}
+.timer{font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;margin:10px 0}
+.ing li{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);list-style:none;display:flex;justify-content:space-between;gap:10px}
+.ing{padding:0;margin:0}
+.toast{position:fixed;top:calc(var(--safe-t) + 14px);left:50%;transform:translate(-50%,-120px);z-index:40;padding:12px 20px;border-radius:99px;font-weight:700;transition:transform .4s cubic-bezier(.2,1.4,.4,1);white-space:nowrap}
+.toast.on{transform:translate(-50%,0)}
+canvas#fx{position:fixed;inset:0;z-index:50;pointer-events:none}
+select,.sel-wrap{font:inherit;color:var(--ink)}
+.field{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;margin-bottom:10px;border-radius:20px}
+.field select{background:rgba(255,255,255,.12);border:1px solid var(--glass-b);color:#fff;border-radius:12px;padding:8px}
+.field select option{color:#000}
+.perk{padding:8px 0;font-size:16px}
+.price{font-size:44px;font-weight:800;letter-spacing:-.03em}
+.empty{text-align:center;color:var(--mute);padding:40px 10px}
+.empty b{font-size:54px;display:block}
+.demo{font-size:12px;color:var(--acc2);text-align:center;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="aurora"><i></i><i></i><i></i></div>
+<div id="app">
+
+  <!-- HOME -->
+  <section class="screen on" id="s-home">
+    <div class="row"><div class="pill glass" id="streakPill">🔥 0 day streak</div><div class="sp"></div><div class="pill glass" id="lvlPill">Lv 1</div></div>
+    <h1>What's in your<br>fridge? 👀</h1>
+    <p class="sub">Snap a photo. Get dinner in seconds. No cooking skills needed.</p>
+    <button class="cta" id="scanBtn"><span style="font-size:26px">📸</span> Scan my fridge</button>
+    <div class="stat">
+      <div class="glass"><b id="stCooked">0</b><span>meals cooked</span></div>
+      <div class="glass"><b id="stSaved">$0</b><span>saved vs takeout</span></div>
+      <div class="glass"><b id="stLeft">3</b><span>free scans left</span></div>
+    </div>
+    <div class="glass" style="padding:14px 16px">
+      <div class="row"><b id="rankName">Kitchen Rookie</b><div class="sp"></div><span class="sub" style="margin:0" id="xpTxt">0 / 100 XP</span></div>
+      <div class="bar"><i id="xpBar" style="width:0"></i></div>
+    </div>
+    <h2>Daily challenge</h2>
+    <div class="glass" style="padding:16px" id="daily"></div>
+    <button class="cta sec" id="uploadHome" style="margin-top:14px">🖼️ Choose a photo instead</button>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="s-results">
+    <div class="row"><button class="pill glass" data-go="home">← Back</button><div class="sp"></div><button class="pill glass" id="prefsBtn">⚙️ Prefs</button></div>
+    <h1 style="font-size:28px;margin-top:14px">I found this</h1>
+    <p class="sub">Tap to remove anything that's wrong. Add what I missed.</p>
+    <div class="chips" id="ingChips"></div>
+    <div class="row" style="margin:12px 0"><input id="addIng" placeholder="Add an ingredient…" class="glass" style="flex:1;padding:12px 16px;border-radius:99px;color:#fff;font:inherit;outline:0"><button class="pill glass" id="addBtn">＋</button></div>
+    <button class="cta sec" id="regen">↻ Update recipes</button>
+    <div class="demo" id="demoNote" hidden>Demo mode — connect the AI key to scan real photos.</div>
+    <h2>Cook this tonight</h2>
+    <div id="recipes"></div>
+  </section>
+
+  <!-- COOKBOOK -->
+  <section class="screen" id="s-book">
+    <h1>Your cookbook 📖</h1>
+    <p class="sub">Everything you've saved or cooked.</p>
+    <div id="bookList"></div>
+  </section>
+
+  <!-- YOU -->
+  <section class="screen" id="s-you">
+    <h1>You 👤</h1>
+    <p class="sub">Preferences & Fridge Chef Pro.</p>
+    <div class="glass field"><span>Diet</span><select id="dietSel"><option>none</option><option>vegetarian</option><option>vegan</option><option>gluten-free</option><option>dairy-free</option><option>high-protein</option></select></div>
+    <div class="glass field"><span>Max cook time</span><select id="timeSel"><option value="15">15 min</option><option value="30">30 min</option><option value="45" selected>45 min</option><option value="90">Any</option></select></div>
+    <button class="cta" id="proBtn" style="margin-top:8px">✨ Get Fridge Chef Pro</button>
+    <p class="sub" style="margin-top:14px;font-size:13px">Your photos are sent to the AI only to identify food and are not stored. Recipes are AI-generated — check allergens and cook meat thoroughly.</p>
+  </section>
+</div>
+
+<nav class="tabs glass" id="tabs">
+  <button data-go="home" class="on"><b>🏠</b>Home</button>
+  <button data-go="book"><b>📖</b>Cookbook</button>
+  <button data-go="you"><b>👤</b>You</button>
+</nav>
+
+<!-- CAMERA -->
+<div id="cam">
+  <video id="vid" playsinline muted autoplay></video>
+  <div class="frame"></div>
+  <div class="top"><button class="round glass" id="camClose">✕</button><button class="round glass" id="camUp">🖼️</button></div>
+  <div class="hint"><span class="glass">Open the door & fit everything in frame</span></div>
+  <div class="ctrl"><span style="width:54px"></span><button class="shutter" id="shutter" aria-label="Take photo"></button><button class="round glass" id="flip">🔄</button></div>
+</div>
+<input type="file" id="file" accept="image/*" hidden>
+
+<div id="load"><div><div class="scanwrap"><img id="loadImg" alt=""></div><h2 id="loadTxt">Spotting ingredients</h2><div class="dots" style="font-size:30px"><span>•</span><span>•</span><span>•</span></div></div></div>
+
+<!-- RECIPE SHEET -->
+<div class="sheet" id="recSheet"><div class="in glass" id="recIn"></div></div>
+<!-- COOK MODE -->
+<div class="sheet" id="cookSheet"><div class="in glass" id="cookIn"></div></div>
+<!-- PAYWALL -->
+<div class="sheet" id="paySheet"><div class="in glass">
+  <div style="text-align:center"><div style="font-size:54px">✨</div><h1 style="font-size:28px">Fridge Chef Pro</h1>
+  <div class="price">$6.99<span style="font-size:16px;color:var(--mute)">/mo</span></div></div>
+  <div style="margin:14px 0">
+    <div class="perk">📸 100 fridge scans every month</div>
+    <div class="perk">🥗 Diet & allergy-aware recipes</div>
+    <div class="perk">🛒 Smart shopping lists</div>
+    <div class="perk">🔥 Streak freezes & chef badges</div>
+  </div>
+  <button class="cta" id="payGo">Start Pro</button>
+  <button class="cta sec" id="payClose" style="margin-top:10px">Maybe later</button>
+</div></div>
+
+<div class="toast glass" id="toast"></div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== config ===== */
+const CFG = {
+  endpoint: "/.netlify/functions/cook",
+  freeScansPerWeek: 3,
+  proScansPerMonth: 100,          // hard cap keeps AI cost ≈ 10–15% of the $6.99 price
+  checkoutUrl: "",                // paste your Stripe Payment Link here
+  avgTakeoutSaving: 12,           // $ saved each time you cook instead of ordering
+};
+
+/* ===== state ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} };
+let S = Object.assign({ xp:0, cooked:0, streak:0, lastDay:"", book:[], scans:[], pro:false, diet:"none", maxTime:45, daily:{} }, load("fc_state", {}));
+const persist = () => save("fc_state", S);
+let cur = { ingredients: [], recipes: [], off: new Set(), demo:false };
+
+const today = () => new Date().toISOString().slice(0,10);
+const RANKS = [["Kitchen Rookie",0],["Home Cook",100],["Line Cook",300],["Sous Chef",700],["Head Chef",1500],["Iron Legend",3000]];
+const rank = () => { let i = 0; RANKS.forEach((r,k) => { if (S.xp >= r[1]) i = k }); return i };
+
+/* ===== nav ===== */
+function go(name){
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === "s-"+name));
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.go === name));
+  if (name === "book") renderBook();
+  if (name === "home") renderHome();
+  $("#tabs").style.display = name === "results" ? "none" : "";
+}
+document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go) });
+
+/* ===== home ===== */
+function scansLeft(){
+  const now = Date.now(), win = S.pro ? 30*864e5 : 7*864e5, cap = S.pro ? CFG.proScansPerMonth : CFG.freeScansPerWeek;
+  S.scans = S.scans.filter(t => now - t < win);
+  return Math.max(0, cap - S.scans.length);
+}
+const DAILIES = [
+  ["Cook any meal today","cook",30],["Scan your pantry, not just the fridge","scan",20],["Save a recipe to your cookbook","save",15]
+];
+function renderHome(){
+  const r = rank(), next = RANKS[r+1];
+  $("#streakPill").textContent = `🔥 ${S.streak} day streak`;
+  $("#lvlPill").textContent = `Lv ${r+1}`;
+  $("#stCooked").textContent = S.cooked;
+  $("#stSaved").textContent = "$" + S.cooked * CFG.avgTakeoutSaving;
+  $("#stLeft").textContent = scansLeft();
+  $("#rankName").textContent = RANKS[r][0];
+  $("#xpTxt").textContent = next ? `${S.xp} / ${next[1]} XP` : `${S.xp} XP · MAX`;
+  $("#xpBar").style.width = next ? ((S.xp - RANKS[r][1]) / (next[1] - RANKS[r][1]) * 100) + "%" : "100%";
+  const d = DAILIES[new Date().getDate() % DAILIES.length], done = S.daily[today()];
+  $("#daily").innerHTML = `<div class="row"><div><b>${d[0]}</b><div class="sub" style="margin:0">+${d[2]} bonus XP</div></div><div class="sp"></div><div style="font-size:30px">${done?"✅":"🎯"}</div></div>`;
+}
+function bump(kind){
+  const d = DAILIES[new Date().getDate() % DAILIES.length];
+  if (d[1] === kind && !S.daily[today()]) { S.daily[today()] = 1; addXP(d[2], "Daily challenge done!"); }
+}
+function addXP(n, msg){
+  const before = rank(); S.xp += n; persist();
+  toast(`+${n} XP${msg ? " · "+msg : ""}`);
+  if (rank() > before) setTimeout(() => { toast(`🎉 Rank up: ${RANKS[rank()][0]}!`); confetti(); }, 1600);
+}
+function touchStreak(){
+  const t = today(); if (S.lastDay === t) return;
+  const y = new Date(Date.now() - 864e5).toISOString().slice(0,10);
+  S.streak = S.lastDay === y ? S.streak + 1 : 1; S.lastDay = t; persist();
+}
+
+/* ===== camera ===== */
+let stream = null, facing = "environment";
+async function openCam(){
+  if (scansLeft() <= 0) return showPay();
+  $("#cam").classList.add("on");
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:facing, width:{ideal:1280}, height:{ideal:1280} }, audio:false });
+    $("#vid").srcObject = stream;
+  } catch { closeCam(); $("#file").click(); }       // no camera / denied → native picker (which also offers camera on phones)
+}
+function closeCam(){ if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; $("#cam").classList.remove("on"); }
+$("#scanBtn").onclick = openCam;
+$("#camClose").onclick = closeCam;
+$("#flip").onclick = () => { facing = facing === "environment" ? "user" : "environment"; closeCam(); openCam(); };
+$("#camUp").onclick = () => { closeCam(); $("#file").click(); };
+$("#uploadHome").onclick = () => scansLeft() > 0 ? $("#file").click() : showPay();
+$("#shutter").onclick = () => {
+  const v = $("#vid"); if (!v.videoWidth) return;
+  navigator.vibrate?.(30);
+  const c = drawScaled(v, v.videoWidth, v.videoHeight);
+  closeCam(); analyze(c);
+};
+$("#file").onchange = e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  const img = new Image(); img.onload = () => { analyze(drawScaled(img, img.naturalWidth, img.naturalHeight)); URL.revokeObjectURL(img.src) };
+  img.src = URL.createObjectURL(f);
+};
+// 1024px JPEG keeps AI vision cost low while staying legible
+function drawScaled(src, w, h){
+  const m = 1024, k = Math.min(1, m / Math.max(w, h)), c = document.createElement("canvas");
+  c.width = Math.round(w*k); c.height = Math.round(h*k); c.getContext("2d").drawImage(src, 0, 0, c.width, c.height); return c;
+}
+
+/* ===== AI ===== */
+async function callAI(body){
+  const r = await fetch(CFG.endpoint, { method:"POST", headers:{"content-type":"application/json"},
+    body: JSON.stringify({ diet:S.diet, maxTime:S.maxTime, ...body }) });
+  if (!r.ok) { const e = new Error("ai"); e.code = r.status; throw e; }
+  return r.json();
+}
+const DEMO = { ingredients:[{name:"eggs",emoji:"🥚"},{name:"spinach",emoji:"🥬"},{name:"cheese",emoji:"🧀"},{name:"tomatoes",emoji:"🍅"},{name:"rice",emoji:"🍚"}],
+  recipes:[
+   {title:"Cheesy Spinach Omelette",emoji:"🍳",time_min:10,difficulty:"Easy",calories:380,missing:[],ingredients:[{item:"eggs",amount:"3"},{item:"spinach",amount:"1 handful"},{item:"cheese",amount:"¼ cup"},{item:"oil",amount:"1 tsp"}],
+    steps:[{text:"Crack 3 eggs into a bowl, add a pinch of salt and whisk with a fork until fully yellow.",timer_sec:0},{text:"Heat a pan on medium with 1 tsp oil. Add spinach and stir 30 seconds until wilted.",timer_sec:30},{text:"Pour in the eggs. Let them set without stirring until the edges are firm.",timer_sec:90},{text:"Sprinkle cheese on one half, fold the omelette over, and slide onto a plate.",timer_sec:0}],tip:"Medium heat, not high — it keeps eggs soft instead of rubbery."},
+   {title:"Tomato Egg Fried Rice",emoji:"🍚",time_min:15,difficulty:"Easy",calories:520,missing:["soy sauce"],ingredients:[{item:"cooked rice",amount:"2 cups"},{item:"eggs",amount:"2"},{item:"tomatoes",amount:"1 chopped"},{item:"oil",amount:"1 tbsp"}],
+    steps:[{text:"Heat oil on medium-high. Add chopped tomato and cook until soft and saucy.",timer_sec:120},{text:"Push tomato aside, scramble the eggs in the empty spot until just set.",timer_sec:60},{text:"Add rice, break up clumps, and stir everything for 3 minutes until hot.",timer_sec:180},{text:"Season with salt, pepper and a splash of soy sauce if you have it.",timer_sec:0}],tip:"Day-old rice fries best — it's drier."},
+   {title:"Spinach Cheese Scramble Bowl",emoji:"🥣",time_min:12,difficulty:"Easy",calories:450,missing:[],ingredients:[{item:"rice",amount:"1 cup cooked"},{item:"eggs",amount:"2"},{item:"spinach",amount:"1 handful"},{item:"cheese",amount:"2 tbsp"}],
+    steps:[{text:"Warm the rice in the microwave for 1 minute.",timer_sec:60},{text:"Scramble eggs in an oiled pan on medium, add spinach at the end.",timer_sec:120},{text:"Pile on the rice, top with cheese and let it melt.",timer_sec:0}],tip:"Add hot sauce for an easy upgrade."},
+   {title:"Baked Tomato Egg Cups",emoji:"🍅",time_min:25,difficulty:"Medium",calories:300,missing:[],ingredients:[{item:"tomatoes",amount:"2 large"},{item:"eggs",amount:"2"},{item:"cheese",amount:"2 tbsp"}],
+    steps:[{text:"Heat the oven to 200°C / 400°F. Slice the tops off the tomatoes and scoop out the insides.",timer_sec:0},{text:"Crack an egg into each tomato, add salt, pepper and cheese.",timer_sec:0},{text:"Bake until the whites are set but the yolk still wobbles.",timer_sec:900}],tip:"Slice a tiny bit off the bottom so they stand upright."}]};
+
+async function analyze(canvas){
+  $("#loadImg").src = canvas.toDataURL("image/jpeg", .5);
+  $("#loadTxt").textContent = "Spotting ingredients"; $("#load").classList.add("on");
+  const tm = setTimeout(() => $("#loadTxt").textContent = "Writing your recipes", 2500);
+  let data;
+  try { data = await callAI({ image: canvas.toDataURL("image/jpeg", .72).split(",")[1] }); cur.demo = false; S.scans.push(Date.now()); persist(); }
+  catch (e) {
+    if ([404,405,501,503].includes(e.code) || e instanceof TypeError) { data = DEMO; cur.demo = true; }   // not configured / offline → demo
+    else data = null;
+  }
+  clearTimeout(tm); $("#load").classList.remove("on");
+  if (!data || !data.ingredients?.length) return toast("Couldn't spot any food — try better light 💡");
+  touchStreak(); bump("scan"); addXP(10, "Scan complete");
+  cur.ingredients = data.ingredients; cur.recipes = data.recipes || []; cur.off = new Set();
+  renderResults(); go("results"); confetti(30);
+}
+
+function renderResults(){
+  $("#demoNote").hidden = !cur.demo;
+  $("#ingChips").innerHTML = cur.ingredients.map((g,i) => `<button class="chip ${cur.off.has(i)?"off":""}" data-i="${i}">${esc(g.emoji||"🍴")} ${esc(g.name)}</button>`).join("");
+  $("#recipes").innerHTML = cur.recipes.map((r,i) => `
+    <button class="card glass" style="animation-delay:${i*90}ms" data-r="${i}">
+      <span class="emo">${esc(r.emoji||"🍽️")}</span><div class="t">${esc(r.title)}</div>
+      <div class="meta"><span>⏱ ${esc(r.time_min)} min</span><span>${esc(r.difficulty)}</span><span>🔥 ${esc(r.calories)} cal</span>
+      ${r.missing?.length ? `<span class="miss">+ ${esc(r.missing.join(", "))}</span>` : `<span style="color:var(--good)">✓ have it all</span>`}</div>
+    </button>`).join("");
+}
+$("#ingChips").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; const i = +b.dataset.i; cur.off.has(i) ? cur.off.delete(i) : cur.off.add(i); renderResults(); };
+const addIng = () => { const v = $("#addIng").value.trim(); if (!v) return; cur.ingredients.push({name:v, emoji:"➕"}); $("#addIng").value = ""; renderResults(); };
+$("#addBtn").onclick = addIng; $("#addIng").onkeydown = e => e.key === "Enter" && addIng();
+$("#regen").onclick = async () => {
+  const list = cur.ingredients.filter((_,i) => !cur.off.has(i)).map(g => g.name);
+  if (!list.length) return toast("Keep at least one ingredient");
+  if (cur.demo) return toast("Demo mode: connect the AI key");
+  $("#loadTxt").textContent = "Rewriting recipes"; $("#loadImg").removeAttribute("src"); $("#load").classList.add("on");
+  try { const d = await callAI({ ingredients:list }); cur.recipes = d.recipes || []; renderResults(); }
+  catch { toast("Something went wrong — try again"); }
+  $("#load").classList.remove("on");
+};
+$("#recipes").onclick = e => { const c = e.target.closest("[data-r]"); if (c) showRecipe(cur.recipes[+c.dataset.r]); };
+$("#prefsBtn").onclick = () => go("you");
+
+/* ===== recipe + cook mode ===== */
+const isSaved = r => S.book.some(b => b.title === r.title);
+function showRecipe(r){
+  $("#recIn").innerHTML = `
+    <div class="row"><span style="font-size:46px">${esc(r.emoji||"🍽️")}</span><div><h1 style="font-size:26px;margin:0">${esc(r.title)}</h1>
+    <div class="meta"><span>⏱ ${esc(r.time_min)} min</span><span>${esc(r.difficulty)}</span><span>🔥 ${esc(r.calories)}</span></div></div></div>
+    <h2>Ingredients</h2><ul class="ing">${(r.ingredients||[]).map(i => `<li><span>${esc(i.item)}</span><span class="sub" style="margin:0">${esc(i.amount)}</span></li>`).join("")}</ul>
+    ${r.missing?.length ? `<p class="miss">🛒 You'll also need: ${esc(r.missing.join(", "))}</p>` : ""}
+    <h2>Steps</h2>${(r.steps||[]).map((s,i) => `<div class="step glass"><div class="n">${i+1}</div><div>${esc(s.text)}</div></div>`).join("")}
+    ${r.tip ? `<p class="sub">💡 ${esc(r.tip)}</p>` : ""}
+    <button class="cta" id="startCook" style="margin-top:8px">👩‍🍳 Start cooking</button>
+    <div class="row" style="margin-top:10px"><button class="cta sec" id="saveR">${isSaved(r)?"✓ Saved":"♡ Save"}</button><button class="cta sec" id="closeR">Close</button></div>`;
+  $("#recSheet").classList.add("on");
+  $("#startCook").onclick = () => { $("#recSheet").classList.remove("on"); startCook(r); };
+  $("#closeR").onclick = () => $("#recSheet").classList.remove("on");
+  $("#saveR").onclick = () => {
+    if (isSaved(r)) return;
+    S.book.unshift({ ...r, saved: Date.now() }); persist(); $("#saveR").textContent = "✓ Saved"; bump("save"); addXP(5);
+  };
+}
+$("#recSheet").onclick = e => { if (e.target.id === "recSheet") e.currentTarget.classList.remove("on") };
+
+let tInt = null;
+function startCook(r, i = 0){
+  clearInterval(tInt);
+  const steps = r.steps || [], s = steps[i], last = i === steps.length - 1;
+  $("#cookIn").innerHTML = `
+    <div class="row"><span class="pill glass">Step ${i+1} / ${steps.length}</span><div class="sp"></div><button class="pill glass" id="cx">✕</button></div>
+    <div class="bar" style="margin:14px 0"><i style="width:${(i+1)/steps.length*100}%"></i></div>
+    <div class="cookbig">${esc(s.text)}</div>
+    ${s.timer_sec ? `<div class="timer" id="tm">${fmt(s.timer_sec)}</div><button class="cta sec" id="tgo">▶ Start timer</button>` : ""}
+    <div class="row" style="margin-top:14px">${i ? `<button class="cta sec" id="prev" style="flex:1">←</button>` : ""}
+    <button class="cta" id="next" style="flex:3">${last ? "🎉 I cooked it!" : "Next step →"}</button></div>`;
+  $("#cookSheet").classList.add("on");
+  $("#cx").onclick = () => { clearInterval(tInt); $("#cookSheet").classList.remove("on"); };
+  if (i) $("#prev").onclick = () => startCook(r, i-1);
+  $("#next").onclick = () => last ? finishCook(r) : startCook(r, i+1);
+  if (s.timer_sec) $("#tgo").onclick = () => {
+    let left = s.timer_sec; $("#tgo").disabled = true; $("#tgo").textContent = "Running…";
+    tInt = setInterval(() => { left--; $("#tm").textContent = fmt(left);
+      if (left <= 0) { clearInterval(tInt); navigator.vibrate?.([200,100,200]); toast("⏰ Timer done!"); } }, 1000);
+  };
+}
+const fmt = n => `${Math.floor(n/60)}:${String(Math.max(0,n)%60).padStart(2,"0")}`;
+function finishCook(r){
+  clearInterval(tInt); $("#cookSheet").classList.remove("on");
+  S.cooked++; touchStreak(); bump("cook");
+  if (!isSaved(r)) S.book.unshift({ ...r, saved: Date.now() });
+  const b = S.book.find(x => x.title === r.title); if (b) b.cooked = (b.cooked || 0) + 1;
+  persist(); addXP(40, `You saved ~$${CFG.avgTakeoutSaving}`); confetti(120); navigator.vibrate?.([60,40,60]);
+  renderHome();
+}
+
+/* ===== cookbook ===== */
+function renderBook(){
+  $("#bookList").innerHTML = S.book.length ? S.book.map((r,i) => `
+    <button class="card glass" data-b="${i}"><span class="emo">${esc(r.emoji||"🍽️")}</span><div class="t">${esc(r.title)}</div>
+    <div class="meta"><span>⏱ ${esc(r.time_min)} min</span>${r.cooked ? `<span>✅ cooked ${r.cooked}×</span>` : ""}</div></button>`).join("")
+    : `<div class="empty"><b>🍽️</b>Nothing here yet.<br>Scan your fridge and cook something!</div>`;
+}
+$("#bookList").onclick = e => { const c = e.target.closest("[data-b]"); if (c) showRecipe(S.book[+c.dataset.b]); };
+
+/* ===== prefs / pro ===== */
+$("#dietSel").value = S.diet; $("#timeSel").value = String(S.maxTime);
+$("#dietSel").onchange = e => { S.diet = e.target.value; persist(); };
+$("#timeSel").onchange = e => { S.maxTime = +e.target.value; persist(); };
+function showPay(){ $("#paySheet").classList.add("on"); }
+$("#proBtn").onclick = showPay;
+$("#payClose").onclick = () => $("#paySheet").classList.remove("on");
+$("#payGo").onclick = () => CFG.checkoutUrl ? (location.href = CFG.checkoutUrl) : toast("Checkout isn't connected yet");
+
+/* ===== toast + confetti ===== */
+let tt; function toast(m){ const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 2200); }
+function confetti(n = 80){
+  const c = $("#fx"), x = c.getContext("2d"); c.width = innerWidth; c.height = innerHeight;
+  const cols = ["#ff7a45","#ffc247","#7c3aed","#4ade80","#38bdf8","#fff"];
+  const p = Array.from({length:n}, () => ({ x:innerWidth/2, y:innerHeight*.6, vx:(Math.random()-.5)*14, vy:-Math.random()*16-4, s:Math.random()*8+4, c:cols[Math.random()*cols.length|0], r:Math.random()*6 }));
+  let f = 0; (function tick(){ x.clearRect(0,0,c.width,c.height);
+    p.forEach(q => { q.vy += .45; q.x += q.vx; q.y += q.vy; q.r += .2; x.save(); x.translate(q.x,q.y); x.rotate(q.r); x.fillStyle = q.c; x.fillRect(-q.s/2,-q.s/2,q.s,q.s*.6); x.restore(); });
+    if (++f < 110) requestAnimationFrame(tick); else x.clearRect(0,0,c.width,c.height); })();
+}
+
+renderHome();
+if ("serviceWorker" in navigator) {} // (PWA install can be added later)
+</script>
+</body>
+</html>
