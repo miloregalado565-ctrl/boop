@@ -1,0 +1,26 @@
+{
+  "name": "notch-bot",
+  "version": "1.0.0",
+  "description": "Boop lives in your MacBook notch",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac --dir",
+    "dist": "electron-builder --mac"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.boop.notchbot",
+    "productName": "Notch Bot",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": "dmg"
+    },
+    "nsis": {
+      "oneClick": false
+    }
+  }
+}

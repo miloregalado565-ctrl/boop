@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Notch Bot</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  -webkit-app-region: no-drag;
+  user-select: none;
+}
+
+/* ── PILL (collapsed) ── */
+#pill {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 210px;
+  height: 34px;
+  background: #000;
+  border-radius: 0 0 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  z-index: 10;
+}
+
+#pill:hover {
+  background: #111;
+  box-shadow: 0 4px 24px rgba(255,107,53,0.35);
+}
+
+/* Robot face inside pill */
+.robot-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.robot-eye {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #ff6b35;
+  animation: blink 3.5s ease-in-out infinite;
+}
+.robot-eye.right { animation-delay: 0.15s; }
+
+@keyframes blink {
+  0%, 88%, 100% { transform: scaleY(1); }
+  92%            { transform: scaleY(0.1); }
+}
+
+.robot-smile {
+  width: 12px;
+  height: 5px;
+  border: 1.5px solid #ff6b35;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+}
+
+#pill-time {
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.3px;
+  min-width: 44px;
+  text-align: right;
+}
+
+/* orange dot pulse */
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff6b35;
+  animation: pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── EXPANDED PANEL ── */
+#panel {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  background: rgba(10,10,10,0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 0 0 24px 24px;
+  padding: 14px 16px 18px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-top: none;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,107,53,0.2);
+}
+
+#panel.open { display: flex; }
+
+/* Panel header */
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-robot {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(255,107,53,0.12);
+  border: 0.5px solid rgba(255,107,53,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panel-robot-eyes {
+  display: flex;
+  gap: 4px;
+}
+
+.panel-eye {
+  width: 6px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: #ff6b35;
+  animation: blink 3.5s ease-in-out infinite;
+}
+.panel-eye.r { animation-delay: 0.15s; }
+
+.panel-name {
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+.panel-name span { color: #ff6b35; }
+
+.close-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: none;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.close-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+/* Time display */
+.time-block {
+  text-align: center;
+  padding: 10px 0 6px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.07);
+}
+
+#big-time {
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 42px;
+  font-weight: 200;
+  color: #fff;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+#big-date {
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+  letter-spacing: 0.2px;
+}
+
+/* Stat row */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 10px 10px 9px;
+  border: 0.5px solid rgba(255,255,255,0.07);
+}
+
+.stat-label {
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 10px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.stat-val {
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ff6b35;
+}
+
+.stat-sub {
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 10px;
+  color: #444;
+  margin-top: 2px;
+}
+
+/* Message */
+.boop-msg {
+  background: rgba(255,107,53,0.08);
+  border: 0.5px solid rgba(255,107,53,0.2);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+  min-height: 36px;
+  transition: opacity 0.3s;
+}
+
+.boop-msg strong { color: #ff6b35; }
+
+/* Quit */
+.quit-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.quit-btn {
+  font-family: -apple-system, 'SF Pro Text', sans-serif;
+  font-size: 11px;
+  color: #444;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: color 0.15s;
+}
+.quit-btn:hover { color: #ff4d4d; }
+</style>
+</head>
+<body>
+
+<!-- COLLAPSED PILL -->
+<div id="pill" onclick="openPanel()">
+  <div class="robot-pill">
+    <div class="robot-eye left"></div>
+    <div class="robot-smile"></div>
+    <div class="robot-eye right"></div>
+  </div>
+  <div id="pill-time">--:--</div>
+  <div class="pulse-dot"></div>
+</div>
+
+<!-- EXPANDED PANEL -->
+<div id="panel">
+  <div class="panel-head">
+    <div class="panel-logo">
+      <div class="panel-robot">
+        <div class="panel-robot-eyes">
+          <div class="panel-eye l"></div>
+          <div class="panel-eye r"></div>
+        </div>
+      </div>
+      <div class="panel-name">Notch<span>Bot</span></div>
+    </div>
+    <button class="close-btn" onclick="closePanel()">✕</button>
+  </div>
+
+  <div class="time-block">
+    <div id="big-time">--:--</div>
+    <div id="big-date">Loading...</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Uptime</div>
+      <div class="stat-val" id="stat-uptime">0m</div>
+      <div class="stat-sub">since launch</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Session</div>
+      <div class="stat-val" id="stat-clicks">0</div>
+      <div class="stat-sub">open count</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Vibe</div>
+      <div class="stat-val" id="stat-vibe">🟠</div>
+      <div class="stat-sub" id="stat-vibe-label">active</div>
+    </div>
+  </div>
+
+  <div class="boop-msg" id="boop-msg">
+    <strong>boop!</strong> i live in your notch now 🤖
+  </div>
+
+  <div class="quit-row">
+    <button class="quit-btn" onclick="window.notch.quit()">quit notch bot</button>
+  </div>
+</div>
+
+<script>
+const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const MSGS = [
+  '<strong>boop!</strong> i live in your notch now 🤖',
+  '<strong>fun fact:</strong> you\'ve opened me <strong id="mc"></strong> time(s) today',
+  '<strong>reminder:</strong> drink some water bestie 💧',
+  '<strong>status:</strong> vibing at <strong>100%</strong> capacity',
+  '<strong>tip:</strong> try <a href="https://boop.app" style="color:#ff6b35;text-decoration:none">boop</a> for viral content 🔥',
+  '<strong>beep boop</strong> — all systems nominal ✅',
+  'you clicked me again. i see you. 👀',
+];
+
+let opens = 0;
+let msgIdx = 0;
+let startTime = Date.now();
+let panelOpen = false;
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function tick() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+  const timeStr = `${pad(h)}:${pad(m)}`;
+
+  document.getElementById('pill-time').textContent = timeStr;
+  document.getElementById('big-time').textContent = timeStr + ':' + pad(s);
+  document.getElementById('big-date').textContent =
+    `${DAYS[now.getDay()]}, ${MONTHS[now.getMonth()]} ${now.getDate()}`;
+
+  const uptimeSec = Math.floor((Date.now() - startTime) / 1000);
+  const uptimeMin = Math.floor(uptimeSec / 60);
+  const uptimeH   = Math.floor(uptimeMin / 60);
+  document.getElementById('stat-uptime').textContent =
+    uptimeH > 0 ? uptimeH + 'h' : uptimeMin + 'm';
+  document.getElementById('stat-clicks').textContent = opens;
+
+  const vibes = ['🟠','🔥','⚡','🟠'];
+  const vibeLabels = ['active','on fire','charged','vibing'];
+  const vi = Math.floor(uptimeSec / 30) % vibes.length;
+  document.getElementById('stat-vibe').textContent = vibes[vi];
+  document.getElementById('stat-vibe-label').textContent = vibeLabels[vi];
+}
+
+function openPanel() {
+  if (panelOpen) return;
+  panelOpen = true;
+  opens++;
+  document.getElementById('pill').style.display = 'none';
+  document.getElementById('panel').classList.add('open');
+  window.notch.expand();
+
+  // cycle message
+  msgIdx = (msgIdx + 1) % MSGS.length;
+  const msg = MSGS[msgIdx].replace('<strong id="mc"></strong>', `<strong>${opens}</strong>`);
+  document.getElementById('boop-msg').innerHTML = msg;
+}
+
+function closePanel() {
+  if (!panelOpen) return;
+  panelOpen = false;
+  document.getElementById('panel').classList.remove('open');
+  document.getElementById('pill').style.display = 'flex';
+  window.notch.collapse();
+}
+
+// click outside closes
+document.addEventListener('mouseleave', () => {
+  if (panelOpen) closePanel();
+});
+
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
