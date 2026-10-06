@@ -11,6 +11,7 @@
   --glass:rgba(255,255,255,.10); --glass-b:rgba(255,255,255,.22); --r:26px;
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
 }
+[hidden]{display:none!important}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
   font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;overflow:hidden}
@@ -113,22 +114,46 @@ select,.sel-wrap{font:inherit;color:var(--ink)}
 .empty{text-align:center;color:var(--mute);padding:40px 10px}
 .empty b{font-size:54px;display:block}
 .demo{font-size:12px;color:var(--acc2);text-align:center;margin:6px 0}
+
+.card{background:linear-gradient(135deg,hsla(var(--h,260),85%,62%,.30),rgba(255,255,255,.07))}
+.float span{position:fixed;font-size:34px;opacity:.13;z-index:0;pointer-events:none;animation:floaty 16s linear infinite;bottom:-60px}
+@keyframes floaty{to{transform:translateY(-115vh) rotate(40deg)}}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.tile{padding:10px 2px 8px;border-radius:20px;text-align:center;background:var(--glass);border:1px solid var(--glass-b);transition:transform .15s,background .2s;position:relative}
+.tile b{display:block;font-size:30px;font-weight:400;line-height:1.1}
+.tile span{font-size:11px;font-weight:600;color:var(--mute);display:block;margin-top:2px;line-height:1.1}
+.tile.on{background:linear-gradient(135deg,var(--acc2),var(--acc));border-color:transparent;animation:bounce .35s}
+.tile.on span{color:#2a1200}
+.tile.on::after{content:"✓";position:absolute;top:3px;right:7px;font-size:12px;font-weight:900;color:#2a1200}
+@keyframes bounce{40%{transform:scale(1.16)}}
+.cat{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:18px 2px 8px;font-weight:700}
+.pickbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + var(--safe-b));z-index:6;width:min(484px,calc(100% - 28px));padding:10px 10px 10px 18px;display:none;align-items:center;gap:12px;border-radius:99px}
+.pickbar.on{display:flex}.pickbar .cta{width:auto;padding:14px 22px;font-size:17px;border-radius:99px}
+.lock{font-size:10px;font-weight:800;padding:3px 7px;border-radius:99px;background:linear-gradient(135deg,var(--acc2),var(--acc));color:#2a1200}
+.ad{margin:14px 0;padding:12px;text-align:center;border-radius:22px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.25);color:var(--mute)}
+.ad small{font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.ad .link{font-size:12px;color:var(--acc2);text-decoration:underline;margin-top:2px}
+.search{width:100%;padding:13px 18px;border-radius:99px;color:#fff;font:inherit;outline:0;margin-bottom:4px}
+.search::placeholder{color:var(--mute)}
 </style>
 </head>
 <body>
 <div class="aurora"><i></i><i></i><i></i></div>
+<div class="float" aria-hidden="true"><span style="left:6%;animation-delay:0s">🍅</span><span style="left:20%;animation-delay:-5s">🧀</span><span style="left:34%;animation-delay:-10s">🥕</span><span style="left:48%;animation-delay:-2s">🍳</span><span style="left:62%;animation-delay:-8s">🥑</span><span style="left:76%;animation-delay:-13s">🍝</span><span style="left:90%;animation-delay:-6s">🍋</span></div>
 <div id="app">
 
   <!-- HOME -->
   <section class="screen on" id="s-home">
     <div class="row"><div class="pill glass" id="streakPill">🔥 0 day streak</div><div class="sp"></div><div class="pill glass" id="lvlPill">Lv 1</div></div>
     <h1>What's in your<br>fridge? 👀</h1>
-    <p class="sub">Snap a photo. Get dinner in seconds. No cooking skills needed.</p>
-    <button class="cta" id="scanBtn"><span style="font-size:26px">📸</span> Scan my fridge</button>
+    <p class="sub">Tell us what you have. Get dinner in seconds. No cooking skills needed.</p>
+    <button class="cta" id="pickBtn"><span style="font-size:26px">🥕</span> Pick what you have</button>
+    <div class="row" style="margin-top:10px"><button class="cta sec" id="scanBtn" style="flex:1.4">📸 AI scan <span class="lock">PRO</span></button><button class="cta sec" id="surpriseBtn" style="flex:1">🎲 Surprise me</button></div>
     <div class="stat">
       <div class="glass"><b id="stCooked">0</b><span>meals cooked</span></div>
       <div class="glass"><b id="stSaved">$0</b><span>saved vs takeout</span></div>
-      <div class="glass"><b id="stLeft">3</b><span>free scans left</span></div>
+      <div class="glass"><b id="stLeft">0</b><span id="stLeftLbl">recipes found</span></div>
     </div>
     <div class="glass" style="padding:14px 16px">
       <div class="row"><b id="rankName">Kitchen Rookie</b><div class="sp"></div><span class="sub" style="margin:0" id="xpTxt">0 / 100 XP</span></div>
@@ -136,7 +161,17 @@ select,.sel-wrap{font:inherit;color:var(--ink)}
     </div>
     <h2>Daily challenge</h2>
     <div class="glass" style="padding:16px" id="daily"></div>
-    <button class="cta sec" id="uploadHome" style="margin-top:14px">🖼️ Choose a photo instead</button>
+    <div class="glass" style="padding:14px 16px;margin-top:12px"><b>💡 Chef tip</b><div class="sub" style="margin:4px 0 0" id="tipTxt"></div></div>
+    <div id="adHome"></div>
+  </section>
+
+  <!-- PICK -->
+  <section class="screen" id="s-pick">
+    <div class="row"><button class="pill glass" data-go="home">← Back</button><div class="sp"></div><button class="pill glass" id="clearPick">Clear all</button></div>
+    <h1 style="font-size:28px;margin-top:14px">What do you have?</h1>
+    <p class="sub">Tap everything in your kitchen. Salt, pepper, oil & water are assumed.</p>
+    <input id="pickSearch" class="search glass" placeholder="🔍  Search ingredients…" autocomplete="off">
+    <div id="pickGrid"></div>
   </section>
 
   <!-- RESULTS -->
@@ -145,7 +180,8 @@ select,.sel-wrap{font:inherit;color:var(--ink)}
     <h1 style="font-size:28px;margin-top:14px">I found this</h1>
     <p class="sub">Tap to remove anything that's wrong. Add what I missed.</p>
     <div class="chips" id="ingChips"></div>
-    <div class="row" style="margin:12px 0"><input id="addIng" placeholder="Add an ingredient…" class="glass" style="flex:1;padding:12px 16px;border-radius:99px;color:#fff;font:inherit;outline:0"><button class="pill glass" id="addBtn">＋</button></div>
+    <div class="row" id="addRow" style="margin:12px 0"><input id="addIng" placeholder="Add an ingredient…" class="glass" style="flex:1;padding:12px 16px;border-radius:99px;color:#fff;font:inherit;outline:0"><button class="pill glass" id="addBtn">＋</button></div>
+    <button class="cta sec" id="morePick" hidden style="margin-bottom:10px">＋ Add more ingredients</button>
     <button class="cta sec" id="regen">↻ Update recipes</button>
     <div class="demo" id="demoNote" hidden>Demo mode — connect the AI key to scan real photos.</div>
     <h2>Cook this tonight</h2>
@@ -157,6 +193,7 @@ select,.sel-wrap{font:inherit;color:var(--ink)}
     <h1>Your cookbook 📖</h1>
     <p class="sub">Everything you've saved or cooked.</p>
     <div id="bookList"></div>
+    <div id="adBook"></div>
   </section>
 
   <!-- YOU -->
@@ -170,6 +207,7 @@ select,.sel-wrap{font:inherit;color:var(--ink)}
   </section>
 </div>
 
+<div class="pickbar glass" id="pickBar"><b id="pickCount">0 picked</b><div class="sp"></div><button class="cta" id="makeBtn">Make recipes →</button></div>
 <nav class="tabs glass" id="tabs">
   <button data-go="home" class="on"><b>🏠</b>Home</button>
   <button data-go="book"><b>📖</b>Cookbook</button>
@@ -197,9 +235,9 @@ select,.sel-wrap{font:inherit;color:var(--ink)}
   <div style="text-align:center"><div style="font-size:54px">✨</div><h1 style="font-size:28px">Fridge Chef Pro</h1>
   <div class="price">$6.99<span style="font-size:16px;color:var(--mute)">/mo</span></div></div>
   <div style="margin:14px 0">
-    <div class="perk">📸 100 fridge scans every month</div>
-    <div class="perk">🥗 Diet & allergy-aware recipes</div>
-    <div class="perk">🛒 Smart shopping lists</div>
+    <div class="perk">📸 AI photo scan — just point at your fridge</div>
+    <div class="perk">✨ Smarter, custom AI recipes</div>
+    <div class="perk">🚫 No ads, ever</div>
     <div class="perk">🔥 Streak freezes & chef badges</div>
   </div>
   <button class="cta" id="payGo">Start Pro</button>
@@ -209,11 +247,14 @@ select,.sel-wrap{font:inherit;color:var(--ink)}
 <div class="toast glass" id="toast"></div>
 <canvas id="fx"></canvas>
 
+<script src="engine.js"></script>
 <script>
 /* ===== config ===== */
 const CFG = {
   endpoint: "/.netlify/functions/cook",
-  freeScansPerWeek: 3,
+  freeScansPerWeek: 0,           // free tier = no AI at all (picker + built-in recipe engine)
+  adsenseClient: "",              // e.g. "ca-pub-XXXXXXXXXXXXXXXX" once Google approves your site
+  adSlots: { home:"", results:"", results2:"", book:"" },   // AdSense ad-unit IDs
   proScansPerMonth: 100,          // hard cap keeps AI cost ≈ 10–15% of the $6.99 price
   checkoutUrl: "",                // paste your Stripe Payment Link here
   avgTakeoutSaving: 12,           // $ saved each time you cook instead of ordering
@@ -224,7 +265,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} };
-let S = Object.assign({ xp:0, cooked:0, streak:0, lastDay:"", book:[], scans:[], pro:false, diet:"none", maxTime:45, daily:{} }, load("fc_state", {}));
+let S = Object.assign({ xp:0, cooked:0, streak:0, lastDay:"", book:[], scans:[], pro:false, diet:"none", maxTime:45, daily:{}, made:0, pick:[] }, load("fc_state", {}));
 const persist = () => save("fc_state", S);
 let cur = { ingredients: [], recipes: [], off: new Set(), demo:false };
 
@@ -238,7 +279,8 @@ function go(name){
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.go === name));
   if (name === "book") renderBook();
   if (name === "home") renderHome();
-  $("#tabs").style.display = name === "results" ? "none" : "";
+  $("#tabs").style.display = (name === "results" || name === "pick") ? "none" : "";
+  $("#pickBar").classList.toggle("on", name === "pick"); if (name === "pick") renderPick();
 }
 document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go) });
 
@@ -248,8 +290,9 @@ function scansLeft(){
   S.scans = S.scans.filter(t => now - t < win);
   return Math.max(0, cap - S.scans.length);
 }
+const TIPS = ["Pat meat dry before cooking — it browns instead of steaming.","Salt as you go, a little at a time. Taste before adding more.","Preheat the pan. If food doesn't sizzle when it lands, wait.","Cook rice in a big batch; cold leftover rice makes the best fried rice.","Cut ingredients the same size so they all finish together.","Rest cooked meat for 5 minutes before cutting — it stays juicy.","A squeeze of lemon at the end wakes up almost any dish."];
 const DAILIES = [
-  ["Cook any meal today","cook",30],["Scan your pantry, not just the fridge","scan",20],["Save a recipe to your cookbook","save",15]
+  ["Cook any meal today","cook",30],["Pick your ingredients and make a recipe","scan",20],["Save a recipe to your cookbook","save",15]
 ];
 function renderHome(){
   const r = rank(), next = RANKS[r+1];
@@ -257,7 +300,10 @@ function renderHome(){
   $("#lvlPill").textContent = `Lv ${r+1}`;
   $("#stCooked").textContent = S.cooked;
   $("#stSaved").textContent = "$" + S.cooked * CFG.avgTakeoutSaving;
-  $("#stLeft").textContent = scansLeft();
+  $("#stLeft").textContent = S.pro ? scansLeft() : S.made; $("#stLeftLbl").textContent = S.pro ? "AI scans left" : "recipes found";
+  $("#pickBtn").classList.toggle("sec", S.pro); $("#scanBtn").classList.toggle("sec", !S.pro); $(".lock").style.display = S.pro ? "none" : "";
+  $("#tipTxt").textContent = TIPS[new Date().getDate() % TIPS.length];
+  $("#adHome").innerHTML = ad("home"); activateAds($("#adHome"));
   $("#rankName").textContent = RANKS[r][0];
   $("#xpTxt").textContent = next ? `${S.xp} / ${next[1]} XP` : `${S.xp} XP · MAX`;
   $("#xpBar").style.width = next ? ((S.xp - RANKS[r][1]) / (next[1] - RANKS[r][1]) * 100) + "%" : "100%";
@@ -282,7 +328,8 @@ function touchStreak(){
 /* ===== camera ===== */
 let stream = null, facing = "environment";
 async function openCam(){
-  if (scansLeft() <= 0) return showPay();
+  if (!S.pro) return showPay("scan");
+  if (scansLeft() <= 0) return toast("Monthly scans used — resets soon");
   $("#cam").classList.add("on");
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:facing, width:{ideal:1280}, height:{ideal:1280} }, audio:false });
@@ -294,7 +341,6 @@ $("#scanBtn").onclick = openCam;
 $("#camClose").onclick = closeCam;
 $("#flip").onclick = () => { facing = facing === "environment" ? "user" : "environment"; closeCam(); openCam(); };
 $("#camUp").onclick = () => { closeCam(); $("#file").click(); };
-$("#uploadHome").onclick = () => scansLeft() > 0 ? $("#file").click() : showPay();
 $("#shutter").onclick = () => {
   const v = $("#vid"); if (!v.videoWidth) return;
   navigator.vibrate?.(30);
@@ -343,19 +389,24 @@ async function analyze(canvas){
   clearTimeout(tm); $("#load").classList.remove("on");
   if (!data || !data.ingredients?.length) return toast("Couldn't spot any food — try better light 💡");
   touchStreak(); bump("scan"); addXP(10, "Scan complete");
-  cur.ingredients = data.ingredients; cur.recipes = data.recipes || []; cur.off = new Set();
+  cur.source = "ai"; cur.ingredients = data.ingredients; cur.recipes = data.recipes || []; cur.off = new Set();
   renderResults(); go("results"); confetti(30);
 }
 
 function renderResults(){
   $("#demoNote").hidden = !cur.demo;
+  const local = cur.source === "local";
+  $("#addRow").hidden = local; $("#morePick").hidden = !local;
   $("#ingChips").innerHTML = cur.ingredients.map((g,i) => `<button class="chip ${cur.off.has(i)?"off":""}" data-i="${i}">${esc(g.emoji||"🍴")} ${esc(g.name)}</button>`).join("");
-  $("#recipes").innerHTML = cur.recipes.map((r,i) => `
-    <button class="card glass" style="animation-delay:${i*90}ms" data-r="${i}">
+  const cards = cur.recipes.map((r,i) => `
+    <button class="card glass" style="animation-delay:${i*90}ms;--h:${hue(r.title)}" data-r="${i}">
       <span class="emo">${esc(r.emoji||"🍽️")}</span><div class="t">${esc(r.title)}</div>
       <div class="meta"><span>⏱ ${esc(r.time_min)} min</span><span>${esc(r.difficulty)}</span><span>🔥 ${esc(r.calories)} cal</span>
       ${r.missing?.length ? `<span class="miss">+ ${esc(r.missing.join(", "))}</span>` : `<span style="color:var(--good)">✓ have it all</span>`}</div>
-    </button>`).join("");
+    </button>` + (i === 1 ? ad("results") : "")).join("");
+  $("#recipes").innerHTML = cards.length ? cards + ad("results2")
+    : `<div class="empty"><b>🤔</b>Not enough for a meal yet.<br>Try adding a protein, a veggie or a carb.</div>` + ad("results2");
+  activateAds($("#recipes"));
 }
 $("#ingChips").onclick = e => { const b = e.target.closest(".chip"); if (!b) return; const i = +b.dataset.i; cur.off.has(i) ? cur.off.delete(i) : cur.off.add(i); renderResults(); };
 const addIng = () => { const v = $("#addIng").value.trim(); if (!v) return; cur.ingredients.push({name:v, emoji:"➕"}); $("#addIng").value = ""; renderResults(); };
@@ -363,6 +414,7 @@ $("#addBtn").onclick = addIng; $("#addIng").onkeydown = e => e.key === "Enter" &
 $("#regen").onclick = async () => {
   const list = cur.ingredients.filter((_,i) => !cur.off.has(i)).map(g => g.name);
   if (!list.length) return toast("Keep at least one ingredient");
+  if (cur.source === "local") { makeLocal(cur.ingredients.filter((_,i) => !cur.off.has(i)).map(g => g.id)); renderResults(); return toast("Updated ✨"); }
   if (cur.demo) return toast("Demo mode: connect the AI key");
   $("#loadTxt").textContent = "Rewriting recipes"; $("#loadImg").removeAttribute("src"); $("#load").classList.add("on");
   try { const d = await callAI({ ingredients:list }); cur.recipes = d.recipes || []; renderResults(); }
@@ -427,8 +479,9 @@ function finishCook(r){
 
 /* ===== cookbook ===== */
 function renderBook(){
+  $("#adBook").innerHTML = ad("book"); activateAds($("#adBook"));
   $("#bookList").innerHTML = S.book.length ? S.book.map((r,i) => `
-    <button class="card glass" data-b="${i}"><span class="emo">${esc(r.emoji||"🍽️")}</span><div class="t">${esc(r.title)}</div>
+    <button class="card glass" style="--h:${hue(r.title)}" data-b="${i}"><span class="emo">${esc(r.emoji||"🍽️")}</span><div class="t">${esc(r.title)}</div>
     <div class="meta"><span>⏱ ${esc(r.time_min)} min</span>${r.cooked ? `<span>✅ cooked ${r.cooked}×</span>` : ""}</div></button>`).join("")
     : `<div class="empty"><b>🍽️</b>Nothing here yet.<br>Scan your fridge and cook something!</div>`;
 }
@@ -453,6 +506,60 @@ function confetti(n = 80){
     p.forEach(q => { q.vy += .45; q.x += q.vx; q.y += q.vy; q.r += .2; x.save(); x.translate(q.x,q.y); x.rotate(q.r); x.fillStyle = q.c; x.fillRect(-q.s/2,-q.s/2,q.s,q.s*.6); x.restore(); });
     if (++f < 110) requestAnimationFrame(tick); else x.clearRect(0,0,c.width,c.height); })();
 }
+
+/* ===== free tier: ingredient picker + offline engine ===== */
+const hue = t => { let h = 0; for (const c of t) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+let pickSet = new Set(S.pick);
+function renderPick(){
+  const q = $("#pickSearch").value.trim().toLowerCase();
+  $("#pickGrid").innerHTML = FC.CATS.map(([cat, label]) => {
+    const items = FC.CATALOG.filter(c => c.cat === cat && (!q || c.name.toLowerCase().includes(q)));
+    return items.length ? `<div class="cat">${label}</div><div class="grid">${items.map(c =>
+      `<button class="tile ${pickSet.has(c.id) ? "on" : ""}" data-id="${c.id}"><b>${c.emoji}</b><span>${esc(c.name)}</span></button>`).join("")}</div>` : "";
+  }).join("") || `<div class="empty"><b>🔍</b>No match. Try another word.</div>`;
+  updatePickBar();
+}
+function updatePickBar(){ const n = pickSet.size; $("#pickCount").textContent = n ? `${n} picked` : "Tap to pick"; $("#makeBtn").style.opacity = n ? 1 : .5; }
+$("#pickGrid").onclick = e => {
+  const t = e.target.closest(".tile"); if (!t) return;
+  const id = t.dataset.id; pickSet.has(id) ? pickSet.delete(id) : pickSet.add(id);
+  S.pick = [...pickSet]; persist(); t.classList.toggle("on", pickSet.has(id)); navigator.vibrate?.(10); updatePickBar();
+};
+$("#pickSearch").oninput = renderPick;
+$("#clearPick").onclick = () => { pickSet.clear(); S.pick = []; persist(); renderPick(); };
+$("#pickBtn").onclick = () => go("pick");
+$("#morePick").onclick = () => go("pick");
+function makeLocal(ids){
+  const res = FC.suggest(ids, { diet:S.diet, maxTime:S.maxTime });
+  cur = { source:"local", demo:false, off:new Set(), recipes:res,
+    ingredients: ids.map(id => ({ id, name:FC.BY_ID[id].name, emoji:FC.BY_ID[id].emoji })) };
+}
+$("#makeBtn").onclick = () => {
+  if (!pickSet.size) return toast("Tap a few ingredients first 👆");
+  makeLocal([...pickSet]); S.made += cur.recipes.length; touchStreak(); bump("scan"); addXP(5, "Nice picks");
+  renderResults(); go("results"); if (cur.recipes.length) confetti(25);
+};
+$("#surpriseBtn").onclick = () => {
+  toast("🎲 Rolling…"); const r = FC.random(S.diet);
+  cur = { source:"local", demo:false, off:new Set(), recipes:[r], ingredients:[] };
+  setTimeout(() => showRecipe(r), 350);
+};
+
+/* ===== ads (free tier only) ===== */
+function ad(slot){
+  if (S.pro) return "";
+  if (CFG.adsenseClient && CFG.adSlots[slot])
+    return `<div class="ad"><ins class="adsbygoogle" style="display:block;width:100%" data-ad-client="${CFG.adsenseClient}" data-ad-slot="${CFG.adSlots[slot]}" data-ad-format="auto" data-full-width-responsive="true"></ins></div>`;
+  return `<div class="ad"><small>Advertisement</small><b>Your ad goes here</b><button class="link" data-pro>Remove ads with Pro</button></div>`;
+}
+function activateAds(root){
+  if (!CFG.adsenseClient) return;
+  if (!window._adsLoaded) { window._adsLoaded = 1; const sc = document.createElement("script"); sc.async = true; sc.crossOrigin = "anonymous";
+    sc.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + CFG.adsenseClient; document.head.appendChild(sc); }
+  root.querySelectorAll("ins.adsbygoogle").forEach(() => { try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {} });
+}
+document.addEventListener("click", e => { if (e.target.closest("[data-pro]")) showPay(); });
+if (location.hostname === "localhost" && location.search.includes("pro=1")) { S.pro = true; }   // dev-only Pro toggle
 
 renderHome();
 if ("serviceWorker" in navigator) {} // (PWA install can be added later)
