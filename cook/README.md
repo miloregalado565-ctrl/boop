@@ -1,7 +1,7 @@
 # Fridge Chef
 
 Two tiers:
-- **Free (ad-supported, zero AI cost):** tap the ingredients you have -> built-in recipe engine (`engine.js`, 33 recipes + a generic skillet fallback, diet/time filters) -> step-by-step cook mode. Also "Surprise me".
+- **Free (ad-supported, zero AI cost):** tap the ingredients you have -> built-in recipe engine (built into `index.html`, 33 recipes + a generic skillet fallback, diet/time filters) -> step-by-step cook mode. Also "Surprise me".
 - **Pro ($6.99/mo):** AI photo scan of your fridge/pantry, no ads.
 
 
